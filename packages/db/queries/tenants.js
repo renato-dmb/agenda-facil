@@ -12,6 +12,34 @@ async function getBySlug(slug) {
   return rows[0] || null;
 }
 
+async function listByOwnerPhone(phone) {
+  const { rows } = await getPool().query(
+    `SELECT t.*, s.recurrence_enabled, s.recurrence_trigger_days,
+            s.recurrence_retry_days, s.recurrence_send_hour, s.ai_active
+     FROM tenants t
+     LEFT JOIN tenant_settings s ON s.tenant_id = t.id
+     WHERE t.owner_phone = $1`,
+    [phone],
+  );
+  return rows;
+}
+
+async function setOwnerPhone(tenantId, phone) {
+  await getPool().query(
+    `UPDATE tenants SET owner_phone = $2, updated_at = NOW() WHERE id = $1`,
+    [tenantId, phone],
+  );
+}
+
+async function setAiActive(tenantId, active) {
+  await getPool().query(
+    `INSERT INTO tenant_settings (tenant_id, ai_active)
+     VALUES ($1, $2)
+     ON CONFLICT (tenant_id) DO UPDATE SET ai_active = $2, updated_at = NOW()`,
+    [tenantId, !!active],
+  );
+}
+
 async function getById(id) {
   const { rows } = await getPool().query(
     `SELECT t.*, s.recurrence_enabled, s.recurrence_trigger_days,
@@ -109,8 +137,11 @@ module.exports = {
   getById,
   getByWhatsAppNumber,
   listActive,
+  listByOwnerPhone,
   upsertTenant,
   upsertSettings,
   setWhatsAppNumber,
+  setOwnerPhone,
+  setAiActive,
   setStatus,
 };

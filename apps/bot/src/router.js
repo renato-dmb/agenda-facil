@@ -1,7 +1,20 @@
 const wa = require('./whatsapp/baileys-manager');
 const { messages, conversations } = require('@agenda-facil/db');
-const { isGroupJid, jidToPhone, normalizePhone } = require('./utils/phone');
+const { isGroupJid, jidToPhone, normalizePhone, brMobileVariants } = require('./utils/phone');
 const { resolveLidToPhone } = require('./utils/lid');
+
+function phoneMatchesOwner(phone, ownerPhone) {
+  if (!phone || !ownerPhone) return false;
+  const variants = new Set(brMobileVariants(phone));
+  for (const v of brMobileVariants(ownerPhone)) {
+    if (variants.has(v)) return true;
+  }
+  return false;
+}
+
+function isAdminCommand(text) {
+  return typeof text === 'string' && text.trim().startsWith('/');
+}
 
 async function route(msg, { tenantId, tenant }) {
   const chatJid = wa.getChatJid(msg);
@@ -27,6 +40,13 @@ async function route(msg, { tenantId, tenant }) {
     phone = normalizePhone(resolved) || resolved || raw;
   }
   if (!phone) return { mode: 'ignore' };
+
+  // Comando administrativo do próprio profissional (dono do tenant).
+  // Tem prioridade mesmo com ai_active=false — é assim que ele destraba o bot.
+  const isOwner = phoneMatchesOwner(phone, tenant.owner_phone);
+  if (isOwner && isAdminCommand(text)) {
+    return { mode: 'admin', phone, text, msg, messageId, chatJid, tenantId, tenant };
+  }
 
   if (tenant.ai_active === false) {
     return { mode: 'paused', phone };

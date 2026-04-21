@@ -19,6 +19,7 @@ const SEEDS = [
     whatsapp_number: process.env.JEFF_WHATSAPP_NUMBER
       ? normalizePhone(process.env.JEFF_WHATSAPP_NUMBER)
       : null,
+    owner_phone: normalizePhone('5511989064335'),
     status: 'pending',
     services: [
       { name: 'Corte', duration_minutes: 30, price_cents: 5000, display_order: 1 },
@@ -90,6 +91,9 @@ async function main() {
       whatsapp_number: seed.whatsapp_number,
       status: seed.status,
     });
+    if (seed.owner_phone) {
+      await tenants.setOwnerPhone(tenant.id, seed.owner_phone);
+    }
     await tenants.upsertSettings(tenant.id, {});
 
     for (const [i, svc] of (seed.services || []).entries()) {

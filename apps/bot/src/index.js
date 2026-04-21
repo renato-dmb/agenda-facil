@@ -5,6 +5,7 @@ const express = require('express');
 const wa = require('./whatsapp/baileys-manager');
 const { route } = require('./router');
 const guestHandler = require('./handlers/guest-handler');
+const adminHandler = require('./handlers/admin-handler');
 const { loadAllActive } = require('./tenancy/resolver');
 const cronScheduler = require('./scheduler/cron');
 const { exchangeCodeForTokens } = require('./integrations/google-calendar/oauth');
@@ -20,6 +21,9 @@ async function handleMessage(msg, { tenantId, tenant }) {
     switch (routed.mode) {
       case 'guest':
         await guestHandler.handle(routed);
+        return;
+      case 'admin':
+        await adminHandler.handle(routed);
         return;
       case 'duplicate':
       case 'ignore':

@@ -26,11 +26,28 @@ function checkRateLimit(tenantId, phone) {
   return { allowed: true };
 }
 
-function historyToClaude(history) {
-  return (history || []).map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
+function firstToolResultIndex(blocks) {
+  if (!Array.isArray(blocks)) return -1;
+  return blocks.findIndex((b) => b && b.type === 'tool_result');
+}
+
+// Trim preservando integridade dos ciclos tool_use → tool_result.
+// A API rejeita user com tool_result sem o assistant tool_use correspondente
+// imediatamente antes, então ao cortar sempre entramos num ponto "seguro":
+// role='user' cujo content é texto simples (sem tool_result).
+function safeTrim(history, keep = 40) {
+  if (history.length <= keep) return history;
+  let start = history.length - keep;
+  while (start < history.length) {
+    const msg = history[start];
+    if (msg.role === 'user') {
+      const content = msg.content;
+      if (typeof content === 'string') break;
+      if (Array.isArray(content) && firstToolResultIndex(content) === -1) break;
+    }
+    start += 1;
+  }
+  return history.slice(start);
 }
 
 async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }) {
@@ -49,14 +66,13 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
   });
 
   const conv = (await conversations.get(tenantId, phone)) || { history: [] };
-  const priorHistory = conv.history || [];
+  const priorHistory = Array.isArray(conv.history) ? conv.history : [];
   const isFirstContact = priorHistory.length === 0;
 
-  const newHistory = [
-    ...priorHistory,
-    { role: 'user', content: text, at: new Date().toISOString() },
-  ];
-  await conversations.upsert(tenantId, phone, { history: newHistory });
+  const userMessage = { role: 'user', content: text };
+  const historyWithUser = [...priorHistory, userMessage];
+
+  await conversations.upsert(tenantId, phone, { history: historyWithUser });
 
   const [knowledge, activeServices, businessHours] = await Promise.all([
     loadKnowledge(tenant.slug),
@@ -70,9 +86,10 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
   };
 
   let replyText = '';
+  let finalHistory = historyWithUser;
   try {
-    const { text: reply } = await chatGuest({
-      history: historyToClaude(newHistory),
+    const { messages: claudeFinal, text: reply } = await chatGuest({
+      history: historyWithUser,
       systemPromptInput: {
         tenant,
         knowledge,
@@ -83,6 +100,7 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
       context,
     });
     replyText = reply;
+    finalHistory = claudeFinal;
   } catch (err) {
     console.error(`[guest-handler:${tenant.slug}] Claude failed:`, err);
     replyText =
@@ -101,12 +119,8 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
       // best-effort
     }
 
-    const savedHistory = [
-      ...newHistory,
-      { role: 'assistant', content: replyText, at: new Date().toISOString() },
-    ].slice(-40);
-
-    await conversations.upsert(tenantId, phone, { history: savedHistory });
+    const trimmed = safeTrim(finalHistory, 40);
+    await conversations.upsert(tenantId, phone, { history: trimmed });
     await messages.log({ tenantId, waMessageId: null, phone, direction: 'out', body: replyText });
   }
 

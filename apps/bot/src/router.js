@@ -1,6 +1,7 @@
 const wa = require('./whatsapp/baileys-manager');
 const { messages, conversations } = require('@agenda-facil/db');
 const { isGroupJid, jidToPhone, normalizePhone } = require('./utils/phone');
+const { resolveLidToPhone } = require('./utils/lid');
 
 async function route(msg, { tenantId, tenant }) {
   const chatJid = wa.getChatJid(msg);
@@ -19,7 +20,12 @@ async function route(msg, { tenantId, tenant }) {
   }
 
   const raw = jidToPhone(chatJid);
-  const phone = normalizePhone(raw) || raw;
+  let phone = normalizePhone(raw);
+  if (!phone) {
+    // Se for LID (@lid), tenta resolver pro número real via mappings do auth_state
+    const resolved = resolveLidToPhone(tenant.slug, raw);
+    phone = normalizePhone(resolved) || resolved || raw;
+  }
   if (!phone) return { mode: 'ignore' };
 
   if (tenant.ai_active === false) {

@@ -1,4 +1,6 @@
 require('dotenv/config');
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const wa = require('./whatsapp/baileys-manager');
 const { route } = require('./router');
@@ -7,6 +9,7 @@ const { loadAllActive } = require('./tenancy/resolver');
 const cronScheduler = require('./scheduler/cron');
 const { exchangeCodeForTokens } = require('./integrations/google-calendar/oauth');
 const { googleOAuth, tenants } = require('@agenda-facil/db');
+const { AUTH_ROOT } = require('./whatsapp/session-store');
 const { google } = require('googleapis');
 
 const PORT = Number(process.env.PORT) || 3001;
@@ -39,14 +42,15 @@ async function bootstrap() {
   wa.setMessageHandler(handleMessage);
 
   for (const tenant of activeTenants) {
+    const credsPath = path.join(AUTH_ROOT, tenant.slug, 'creds.json');
+    if (!fs.existsSync(credsPath)) {
+      console.log(
+        `[boot:${tenant.slug}] sem credentials pareadas — pulando. Rode "pnpm bot:pair ${tenant.slug}" para parear.`,
+      );
+      continue;
+    }
     try {
-      await wa.connectTenant(tenant, {
-        onQr(qr) {
-          console.log(
-            `[whatsapp:${tenant.slug}] QR code available (run "pnpm bot:pair ${tenant.slug}" to pair via terminal)`,
-          );
-        },
-      });
+      await wa.connectTenant(tenant);
     } catch (err) {
       console.error(`[whatsapp:${tenant.slug}] connect failed:`, err.message);
     }

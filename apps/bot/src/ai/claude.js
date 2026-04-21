@@ -27,7 +27,11 @@ async function chatGuest({ history, systemPromptInput, context }) {
     });
 
     const toolUses = response.content.filter((b) => b.type === 'tool_use');
-    if (toolUses.length === 0) break;
+    if (toolUses.length === 0) {
+      // Resposta final em texto — preserva no histórico pra próxima conversa
+      messages.push({ role: 'assistant', content: response.content });
+      break;
+    }
 
     if (iteration === config.MAX_TOOL_ITERATIONS - 1) {
       console.warn(`[Claude] Tool iteration cap (${config.MAX_TOOL_ITERATIONS}) reached`);

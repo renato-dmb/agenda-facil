@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS scheduled_messages (
 
 CREATE INDEX IF NOT EXISTS idx_scheduled_messages_tenant ON scheduled_messages(tenant_id) WHERE active = true;
 
--- Fila concreta: 1 row por (cliente, mensagem, ciclo)
+-- Fila concreta: 1 row por (cliente, mensagem, ciclo).
+-- `cycle_day` é preenchido pela aplicação (data do send_at no fuso do tenant)
+-- e serve como chave de dedup para não re-enfileirar o mesmo cliente+mensagem no mesmo dia.
 CREATE TABLE IF NOT EXISTS scheduled_message_queue (
   id BIGSERIAL PRIMARY KEY,
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -23,6 +25,7 @@ CREATE TABLE IF NOT EXISTS scheduled_message_queue (
   customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
   phone VARCHAR(20) NOT NULL,
   send_at TIMESTAMPTZ NOT NULL,
+  cycle_day DATE NOT NULL,
   sent BOOLEAN NOT NULL DEFAULT false,
   sent_at TIMESTAMPTZ,
   retry_count INT NOT NULL DEFAULT 0,
@@ -32,5 +35,5 @@ CREATE TABLE IF NOT EXISTS scheduled_message_queue (
 
 CREATE INDEX IF NOT EXISTS idx_queue_pending ON scheduled_message_queue(send_at) WHERE sent = false;
 CREATE INDEX IF NOT EXISTS idx_queue_tenant ON scheduled_message_queue(tenant_id, sent, send_at);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_queue_customer_message_day
-  ON scheduled_message_queue(customer_id, scheduled_message_id, ((COALESCE(last_retry_at, created_at))::date));
+CREATE UNIQUE INDEX IF NOT EXISTS idx_queue_customer_message_cycle_day
+  ON scheduled_message_queue(customer_id, scheduled_message_id, cycle_day);

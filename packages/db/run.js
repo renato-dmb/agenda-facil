@@ -6,6 +6,13 @@ require('dotenv/config');
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
 
+function needsSsl(url) {
+  if (!url) return false;
+  if (/sslmode=disable/.test(url)) return false;
+  if (/localhost|127\.0\.0\.1/.test(url)) return false;
+  return true;
+}
+
 async function ensureMigrationsTable(pool) {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -26,7 +33,10 @@ async function run() {
     process.exit(1);
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: needsSsl(process.env.DATABASE_URL) ? { rejectUnauthorized: false } : false,
+  });
   await ensureMigrationsTable(pool);
   const already = await appliedMigrations(pool);
 

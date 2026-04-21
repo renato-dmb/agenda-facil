@@ -26,14 +26,15 @@ async function getActiveByTriggerType(tenantId, triggerType) {
   return rows;
 }
 
-async function enqueueForCustomer({ tenantId, scheduledMessageId, customerId, phone, sendAt }) {
+async function enqueueForCustomer({ tenantId, scheduledMessageId, customerId, phone, sendAt, cycleDay }) {
+  const cycle = cycleDay || String(sendAt).slice(0, 10);
   try {
     const { rows } = await getPool().query(
       `INSERT INTO scheduled_message_queue
-         (tenant_id, scheduled_message_id, customer_id, phone, send_at)
-       VALUES ($1, $2, $3, $4, $5)
+         (tenant_id, scheduled_message_id, customer_id, phone, send_at, cycle_day)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [tenantId, scheduledMessageId, customerId, phone, sendAt],
+      [tenantId, scheduledMessageId, customerId, phone, sendAt, cycle],
     );
     return rows[0];
   } catch (err) {

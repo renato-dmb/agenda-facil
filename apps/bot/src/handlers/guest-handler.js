@@ -65,6 +65,22 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
     body: text,
   });
 
+  // Mensagens sem texto (áudios, figurinhas, reações) ainda não são processadas —
+  // Whisper fica no roadmap da Fase 3. Respondemos placeholder educado e NÃO
+  // chamamos Claude (conteúdo vazio no histórico quebra a próxima chamada).
+  if (!text || !text.trim()) {
+    const polite =
+      'Oi! Por enquanto eu só consigo responder por texto — áudios e figurinhas ainda não. Pode me escrever, por favor? 😊';
+    try {
+      await wa.sendText(tenantId, chatJid, polite);
+      await wa.markRead(tenantId, msg);
+    } catch (err) {
+      console.error(`[guest-handler:${tenant.slug}] send failed:`, err.message);
+    }
+    await messages.log({ tenantId, waMessageId: null, phone, direction: 'out', body: polite });
+    return { mode: 'no_text' };
+  }
+
   const conv = (await conversations.get(tenantId, phone)) || { history: [] };
   const priorHistory = Array.isArray(conv.history) ? conv.history : [];
   const isFirstContact = priorHistory.length === 0;

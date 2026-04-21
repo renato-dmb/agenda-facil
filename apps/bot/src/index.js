@@ -82,19 +82,36 @@ async function bootstrap() {
       const tenant = await tenants.getBySlug(slug);
       if (!tenant) return res.status(404).send('tenant not found');
 
-      const credsPath = path.join(AUTH_ROOT, slug, 'creds.json');
+      const authDir = path.join(AUTH_ROOT, slug);
+      const credsPath = path.join(authDir, 'creds.json');
+      const reset = req.query.reset === '1';
+
+      // Reset: desconecta socket atual e apaga auth_state — força novo QR.
+      // Usado quando trocando de número/WhatsApp.
+      if (reset) {
+        try {
+          await wa.disconnectTenant(tenant.id);
+        } catch (e) {
+          // best-effort
+        }
+        if (fs.existsSync(authDir)) {
+          fs.rmSync(authDir, { recursive: true, force: true });
+        }
+        console.log(`[pair:${slug}] reset — auth_state apagado`);
+      }
+
       const connected = wa.listConnected().some((c) => c.tenantId === tenant.id);
 
-      if (fs.existsSync(credsPath) && connected) {
+      if (!reset && fs.existsSync(credsPath) && connected) {
         return res.status(200).send(
           `<html><body style="font-family:sans-serif;padding:40px;">
             <h2>✓ ${slug} já está pareado</h2>
-            <p>Se precisar reparear, apague <code>auth_state/${slug}/</code> no volume e reinicie.</p>
+            <p>Pra trocar de número/WhatsApp, acesse <code>?reset=1</code> nesta URL.</p>
           </body></html>`,
         );
       }
 
-      if (!connected) {
+      if (!connected || reset) {
         wa.connectTenant(tenant).catch((err) =>
           console.error(`[pair:${slug}] connect error:`, err.message),
         );

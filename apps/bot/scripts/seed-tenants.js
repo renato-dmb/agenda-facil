@@ -12,7 +12,7 @@ const { normalizePhone } = require('../src/utils/phone');
 
 const SEEDS = [
   {
-    slug: 'jeff-barbearia',
+    slug: 'barbeiro-jeff',
     name: 'Barbearia do Jeff',
     profession_type: 'barbearia',
     timezone: 'America/Sao_Paulo',

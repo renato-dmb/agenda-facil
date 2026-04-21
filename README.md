@@ -42,8 +42,8 @@ pnpm install
 cp apps/bot/.env.example apps/bot/.env   # preencha as variáveis
 pnpm db:migrate
 pnpm bot:seed
-pnpm bot:oauth jeff-barbearia            # abre o navegador p/ OAuth do Google Calendar
-pnpm bot:pair jeff-barbearia             # mostra QR code do WhatsApp
+pnpm bot:oauth barbeiro-jeff            # abre o navegador p/ OAuth do Google Calendar
+pnpm bot:pair barbeiro-jeff             # mostra QR code do WhatsApp
 pnpm bot:dev
 ```
 

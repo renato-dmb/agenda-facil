@@ -9,6 +9,10 @@ const { loadTenantAuth } = require('./session-store');
 // Mapa de tenantId -> { sock, slug, meta }
 const sockets = new Map();
 
+// Último QR pendente por tenant (para expor via rota HTTP de pareamento remoto).
+// É limpo assim que o tenant conecta com sucesso.
+const lastQr = new Map();
+
 // Handler global de mensagens entrantes: (msg, { tenantId, tenant }) -> Promise
 let messageHandler = null;
 
@@ -18,6 +22,10 @@ function setMessageHandler(handler) {
 
 function getSocket(tenantId) {
   return sockets.get(tenantId)?.sock || null;
+}
+
+function getLastQr(tenantId) {
+  return lastQr.get(tenantId) || null;
 }
 
 async function sendText(tenantId, jid, text) {
@@ -54,7 +62,10 @@ async function connectTenant(tenant, { onQr, onPaired } = {}) {
 
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect, qr } = update;
-    if (qr && onQr) onQr(qr);
+    if (qr) {
+      lastQr.set(tenant.id, qr);
+      if (onQr) onQr(qr);
+    }
 
     if (connection === 'close') {
       const statusCode = lastDisconnect?.error?.output?.statusCode;
@@ -72,6 +83,7 @@ async function connectTenant(tenant, { onQr, onPaired } = {}) {
       }
     } else if (connection === 'open') {
       console.log(`[WhatsApp:${tenant.slug}] connected`);
+      lastQr.delete(tenant.id);
       if (onPaired) onPaired();
     }
   });
@@ -144,6 +156,7 @@ module.exports = {
   sendText,
   markRead,
   getSocket,
+  getLastQr,
   listConnected,
   getMessageText,
   isAudioMessage,

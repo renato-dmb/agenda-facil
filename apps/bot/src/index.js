@@ -2,6 +2,7 @@ require('dotenv/config');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const QRCode = require('qrcode');
 const wa = require('./whatsapp/baileys-manager');
 const { route } = require('./router');
 const guestHandler = require('./handlers/guest-handler');
@@ -49,7 +50,7 @@ async function bootstrap() {
     const credsPath = path.join(AUTH_ROOT, tenant.slug, 'creds.json');
     if (!fs.existsSync(credsPath)) {
       console.log(
-        `[boot:${tenant.slug}] sem credentials pareadas — pulando. Rode "pnpm bot:pair ${tenant.slug}" para parear.`,
+        `[boot:${tenant.slug}] sem credentials pareadas — acesse /pair/${tenant.slug} no navegador para parear.`,
       );
       continue;
     }
@@ -71,6 +72,65 @@ async function bootstrap() {
       tenants: wa.listConnected(),
       time: new Date().toISOString(),
     });
+  });
+
+  // Pareamento remoto do WhatsApp — QR no navegador. Essencial em produção,
+  // onde não há terminal do container.
+  app.get('/pair/:slug', async (req, res) => {
+    try {
+      const slug = req.params.slug;
+      const tenant = await tenants.getBySlug(slug);
+      if (!tenant) return res.status(404).send('tenant not found');
+
+      const credsPath = path.join(AUTH_ROOT, slug, 'creds.json');
+      const connected = wa.listConnected().some((c) => c.tenantId === tenant.id);
+
+      if (fs.existsSync(credsPath) && connected) {
+        return res.status(200).send(
+          `<html><body style="font-family:sans-serif;padding:40px;">
+            <h2>✓ ${slug} já está pareado</h2>
+            <p>Se precisar reparear, apague <code>auth_state/${slug}/</code> no volume e reinicie.</p>
+          </body></html>`,
+        );
+      }
+
+      if (!connected) {
+        wa.connectTenant(tenant).catch((err) =>
+          console.error(`[pair:${slug}] connect error:`, err.message),
+        );
+      }
+
+      let qr = wa.getLastQr(tenant.id);
+      const deadline = Date.now() + 15000;
+      while (!qr && Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 500));
+        qr = wa.getLastQr(tenant.id);
+      }
+
+      if (!qr) {
+        return res.status(202).send(
+          `<html><body style="font-family:sans-serif;padding:40px;">
+            <h3>Aguardando QR do tenant ${slug}...</h3>
+            <p>Ainda não gerado — recarregue em alguns segundos.</p>
+            <script>setTimeout(() => location.reload(), 3000);</script>
+          </body></html>`,
+        );
+      }
+
+      const dataUrl = await QRCode.toDataURL(qr, { margin: 1, width: 360 });
+      return res.status(200).send(
+        `<html><body style="font-family:sans-serif;padding:40px;text-align:center;">
+          <h2>Parear WhatsApp — ${slug}</h2>
+          <p>WhatsApp → Configurações → Aparelhos Conectados → Conectar um aparelho</p>
+          <img src="${dataUrl}" alt="QR Code" />
+          <p style="color:#888;font-size:13px;">Recarrega a cada 20s enquanto não for pareado.</p>
+          <script>setTimeout(() => location.reload(), 20000);</script>
+        </body></html>`,
+      );
+    } catch (err) {
+      console.error('[pair] error:', err);
+      return res.status(500).send('error: ' + err.message);
+    }
   });
 
   app.get('/oauth/google/callback', async (req, res) => {

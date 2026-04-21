@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+.git
+.env
+.env.*
+apps/bot/.env*
+apps/bot/auth_state
+apps/dashboard/.next
+**/dist
+**/*.log
+.DS_Store
+.claude
+/Users/renatobarbosa/.claude
+docs

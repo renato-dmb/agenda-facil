@@ -1,0 +1,23 @@
+node_modules/
+.pnpm-store/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Baileys auth state (QR sessions, per-tenant secrets)
+apps/bot/auth_state/
+
+# Build / cache
+dist/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# OS
+.DS_Store

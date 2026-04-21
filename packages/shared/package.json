@@ -1,0 +1,10 @@
+{
+  "name": "@agenda-facil/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "pino": "^10.3.1"
+  }
+}

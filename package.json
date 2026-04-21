@@ -1,0 +1,19 @@
+{
+  "name": "agenda-facil",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SaaS multi-tenant de agente IA para profissionais liberais via WhatsApp",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "bot:dev": "pnpm --filter @agenda-facil/bot dev",
+    "bot:start": "pnpm --filter @agenda-facil/bot start",
+    "bot:seed": "pnpm --filter @agenda-facil/bot seed",
+    "bot:oauth": "pnpm --filter @agenda-facil/bot oauth",
+    "bot:pair": "pnpm --filter @agenda-facil/bot pair",
+    "db:migrate": "pnpm --filter @agenda-facil/db migrate",
+    "dashboard:dev": "pnpm --filter @agenda-facil/dashboard dev"
+  }
+}

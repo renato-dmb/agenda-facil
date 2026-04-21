@@ -92,8 +92,15 @@ async function connectTenant(tenant, { onQr, onPaired } = {}) {
     if (type !== 'notify') return;
     for (const msg of messages) {
       if (msg.key.remoteJid === 'status@broadcast') continue;
-      if (msg.key.fromMe) continue;
       if (!msg.message) continue;
+
+      if (msg.key.fromMe) {
+        // Mensagens do próprio número pareado são ignoradas por padrão
+        // (evita loop bot→bot). Exceção: comandos admin (`/...`) enviados
+        // pelo dono no self-chat.
+        const text = getMessageText(msg);
+        if (!text || !text.trim().startsWith('/')) continue;
+      }
 
       if (messageHandler) {
         try {

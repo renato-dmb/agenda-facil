@@ -1,20 +1,7 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const OpenAI = require('openai');
 
-let client = null;
-
-function getClient() {
-  if (!client) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY not set');
-    }
-    client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  }
-  return client;
-}
-
-const MAX_AUDIO_SECONDS = 5 * 60; // 5 minutos
-const MAX_AUDIO_BYTES = 10 * 1024 * 1024; // 10 MB (defesa em profundidade)
+const MAX_AUDIO_SECONDS = 5 * 60; // 5 min
+const MAX_AUDIO_BYTES = 10 * 1024 * 1024; // 10 MB
 
 const USER_MESSAGE_TOO_LARGE =
   'O áudio é muito longo. Envia por favor em texto ou num áudio mais curto (até 5 min).';
@@ -28,6 +15,9 @@ class AudioTooLargeError extends Error {
 }
 
 async function transcribe(msg) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY not set');
+
   const audioInfo = msg.message?.audioMessage || {};
   const seconds = audioInfo.seconds || 0;
   if (seconds > MAX_AUDIO_SECONDS) {
@@ -35,20 +25,30 @@ async function transcribe(msg) {
   }
 
   const buffer = await downloadMediaMessage(msg, 'buffer', {});
-
   if (buffer.length > MAX_AUDIO_BYTES) {
     throw new AudioTooLargeError(`size ${buffer.length} bytes > ${MAX_AUDIO_BYTES}`);
   }
 
-  const file = new File([buffer], 'audio.ogg', { type: 'audio/ogg' });
+  // Node 20+ tem fetch + FormData + Blob nativos via undici — evita polyfills
+  // inconsistentes do SDK openai em ambientes de container.
+  const form = new FormData();
+  form.append('file', new Blob([buffer], { type: 'audio/ogg' }), 'audio.ogg');
+  form.append('model', 'whisper-1');
+  form.append('language', 'pt');
 
-  const response = await getClient().audio.transcriptions.create({
-    model: 'whisper-1',
-    file,
-    language: 'pt',
+  const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}` },
+    body: form,
   });
 
-  return response.text;
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(`whisper http ${res.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  return data.text || '';
 }
 
 function isEnabled() {

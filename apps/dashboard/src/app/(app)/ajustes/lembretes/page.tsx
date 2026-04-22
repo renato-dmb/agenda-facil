@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { RemindersClient } from './reminders-client';
 
 type Template = {
+  name: string;
   content: string;
   offset_minutes: number | null;
   active: boolean;
@@ -13,6 +14,7 @@ type Template = {
 function toTemplate(row: unknown): Template {
   const r = (row as Record<string, unknown>) || {};
   return {
+    name: (r.name as string) || '',
     content: (r.content as string) || '',
     offset_minutes: (r.offset_minutes as number | null) ?? null,
     active: (r.active as boolean) !== false,
@@ -30,18 +32,11 @@ export default async function LembretesPage() {
     scheduled.listByTriggerType(tenant.id, 'post_appointment'),
   ]);
 
-  const pre: Template = preList[0]
-    ? toTemplate(preList[0])
-    : {
-        content:
-          'Oi {first_name}! Tô passando só pra lembrar do seu atendimento hoje às {time} ({service}). Confirma que tá de pé? 💈',
-        offset_minutes: -120,
-        active: false,
-      };
-
+  const pre = (preList as unknown[]).map(toTemplate);
   const post: Template = postList[0]
     ? toTemplate(postList[0])
     : {
+        name: 'lembrete_pos',
         content:
           'Oi {first_name}! 💈 Aqui é pra saber como foi seu atendimento hoje.\n\nDe *1 a 5*, como você avalia o {service} que fizemos?\n(1 = péssimo, 5 = excelente)\n\nDepois me conta se tem algum comentário e se você quer já marcar o retorno pra daqui a algumas semanas!',
         offset_minutes: 120,
@@ -56,12 +51,11 @@ export default async function LembretesPage() {
         </Link>
         <h1 className="mt-2 text-2xl font-semibold">Lembretes</h1>
         <p className="text-muted-foreground">
-          Mensagens automáticas disparadas a partir do horário do agendamento. Reduz faltas e ajuda
-          a trazer feedback.
+          Régua de mensagens automáticas. Padrão: lembrete 24h antes + 2h antes + CSAT após.
         </p>
       </div>
 
-      <RemindersClient initialPre={pre} initialPost={post} />
+      <RemindersClient preTemplates={pre} postTemplate={post} />
     </div>
   );
 }

@@ -5,6 +5,35 @@ const {
 } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const { loadTenantAuth } = require('./session-store');
+const { whatsappContacts } = require('@agenda-facil/db');
+
+function jidToPhoneOnly(jid) {
+  if (!jid) return null;
+  const m = jid.match(/^(\d{10,15})@/);
+  return m ? m[1] : null;
+}
+
+async function syncContactsFromBaileys(tenantId, contacts) {
+  if (!Array.isArray(contacts) || contacts.length === 0) return 0;
+  const rows = [];
+  for (const c of contacts) {
+    if (!c?.id || c.id.endsWith('@broadcast') || c.id.endsWith('@g.us')) continue;
+    rows.push({
+      jid: c.id,
+      phone: jidToPhoneOnly(c.id),
+      push_name: c.notify || c.name || null,
+      verified_name: c.verifiedName || null,
+      notify_name: c.notify || null,
+    });
+  }
+  if (rows.length === 0) return 0;
+  try {
+    return await whatsappContacts.upsertMany(tenantId, rows);
+  } catch (err) {
+    console.error('[baileys] contacts sync failed:', err.message);
+    return 0;
+  }
+}
 
 // Mapa de tenantId -> { sock, slug, meta }
 const sockets = new Map();
@@ -86,6 +115,24 @@ async function connectTenant(tenant, { onQr, onPaired } = {}) {
       lastQr.delete(tenant.id);
       if (onPaired) onPaired();
     }
+  });
+
+  // Sincroniza contatos do WhatsApp do aparelho pareado.
+  // Baileys entrega via vários eventos; normalizamos num upsert idempotente.
+  sock.ev.on('contacts.upsert', async (contacts) => {
+    const n = await syncContactsFromBaileys(tenant.id, contacts);
+    if (n > 0) console.log(`[WhatsApp:${tenant.slug}] contacts.upsert synced ${n}`);
+  });
+
+  sock.ev.on('contacts.update', async (updates) => {
+    const n = await syncContactsFromBaileys(tenant.id, updates);
+    if (n > 0) console.log(`[WhatsApp:${tenant.slug}] contacts.update synced ${n}`);
+  });
+
+  // Primeira sincronização — Baileys entrega contatos junto com o history.set
+  sock.ev.on('messaging-history.set', async ({ contacts }) => {
+    const n = await syncContactsFromBaileys(tenant.id, contacts || []);
+    if (n > 0) console.log(`[WhatsApp:${tenant.slug}] history.set initial contacts: ${n}`);
   });
 
   sock.ev.on('messages.upsert', async ({ messages, type }) => {

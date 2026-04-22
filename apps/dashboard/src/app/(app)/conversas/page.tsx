@@ -3,6 +3,7 @@ import { readSession } from '@/lib/auth';
 import { tenants, conversations } from '@agenda-facil/db';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { formatPhone, relativeFromNow } from '@/lib/format';
 
 type Row = {
@@ -34,9 +35,14 @@ export default async function ConversasPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Conversas</h1>
-        <p className="text-muted-foreground">{rows.length} total</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Conversas</h1>
+          <p className="text-muted-foreground">{rows.length} total</p>
+        </div>
+        <Button asChild>
+          <Link href="/conversas/nova">+ Nova</Link>
+        </Button>
       </div>
 
       {rows.length === 0 ? (

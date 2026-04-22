@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Calendar, MessageCircle, Users, UserCog, Settings } from 'lucide-react';
+import { Home, Calendar, MessageCircle, Users, UserCog, Settings, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ const NAV: NavItem[] = [
   { href: '/agendamentos', label: 'Agenda', icon: Calendar },
   { href: '/conversas', label: 'Conversas', icon: MessageCircle },
   { href: '/clientes', label: 'Clientes', icon: Users },
+  { href: '/reviews', label: 'Avaliações', icon: Star },
   { href: '/contatos', label: 'Contatos', icon: UserCog },
   { href: '/ajustes', label: 'Ajustes', icon: Settings },
 ];

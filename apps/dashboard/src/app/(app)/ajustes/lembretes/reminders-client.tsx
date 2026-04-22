@@ -8,35 +8,62 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Template = {
+  name: string;
   content: string;
   offset_minutes: number | null;
   active: boolean;
 };
 
-export function RemindersClient({
-  initialPre,
-  initialPost,
-}: {
-  initialPre: Template;
-  initialPost: Template;
-}) {
+type Props = {
+  preTemplates: Template[];
+  postTemplate: Template;
+};
+
+const PRE_SLOTS = [
+  { name: 'lembrete_pre_24h', label: 'Lembrete 24h antes', defaultMinutes: 1440 },
+  { name: 'lembrete_pre_2h', label: 'Lembrete 2h antes', defaultMinutes: 120 },
+];
+
+function findTemplate(list: Template[], name: string): Template {
+  const hit = list.find((t) => t.name === name);
+  if (hit) return hit;
+  const defaults: Record<string, string> = {
+    lembrete_pre_24h:
+      'Oi {first_name}! Só passando pra lembrar do seu *{service}* amanhã às {time}. Confirma que tá de pé? 💈',
+    lembrete_pre_2h:
+      'Oi {first_name}! Seu horário com a gente é daqui a pouco — {time}. Até já! 👋',
+  };
+  return {
+    name,
+    content: defaults[name] || '',
+    offset_minutes: null,
+    active: false,
+  };
+}
+
+export function RemindersClient({ preTemplates, postTemplate }: Props) {
   return (
     <div className="space-y-6">
-      <ReminderCard
-        kind="pre_appointment"
-        title="Pré-atendimento"
-        description="Confirmação antes do horário combinado. Ajuda a reduzir no-show."
-        direction="antes"
-        defaultMinutes={120}
-        initial={initialPre}
-      />
+      {PRE_SLOTS.map((slot) => (
+        <ReminderCard
+          key={slot.name}
+          kind="pre_appointment"
+          name={slot.name}
+          title={slot.label}
+          description="Confirmação antes do horário. Pode ter vários lembretes (24h + 2h é o padrão)."
+          direction="antes"
+          defaultMinutes={slot.defaultMinutes}
+          initial={findTemplate(preTemplates, slot.name)}
+        />
+      ))}
       <ReminderCard
         kind="post_appointment"
+        name="lembrete_pos"
         title="Pós-atendimento (pesquisa CSAT)"
-        description="Follow-up que abre a pesquisa de satisfação CSAT. O bot coleta nota 1-5, comentário livre e interesse em retorno. Se o cliente quiser retorno, sugere horários automaticamente."
+        description="Follow-up com coleta de nota 1-5, comentário livre e cross-sell de retorno."
         direction="depois"
         defaultMinutes={120}
-        initial={initialPost}
+        initial={postTemplate}
       />
     </div>
   );
@@ -44,6 +71,7 @@ export function RemindersClient({
 
 function ReminderCard({
   kind,
+  name,
   title,
   description,
   direction,
@@ -51,6 +79,7 @@ function ReminderCard({
   initial,
 }: {
   kind: 'pre_appointment' | 'post_appointment';
+  name: string;
   title: string;
   description: string;
   direction: 'antes' | 'depois';
@@ -86,6 +115,7 @@ function ReminderCard({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           kind,
+          name,
           content: content.trim(),
           offset_minutes: signedMinutes,
           active,

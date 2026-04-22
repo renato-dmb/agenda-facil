@@ -111,6 +111,10 @@ function register(app) {
       }
     }
     await appts.setStatus(id, 'cancelled');
+    await reminderEngine
+      .removeForAppointment(id)
+      .catch(() => {});
+    notifyAppointmentChange(payload.tenant_id, id, 'cancelled').catch(() => {});
     res.json({ ok: true });
   });
 
@@ -188,11 +192,11 @@ function register(app) {
   app.get('/api/bot/reminders', async (req, res) => {
     const payload = await auth(req, res);
     if (!payload) return;
-    const [pre, post] = await Promise.all([
+    const [preList, postList] = await Promise.all([
       scheduled.listByTriggerType(payload.tenant_id, 'pre_appointment'),
       scheduled.listByTriggerType(payload.tenant_id, 'post_appointment'),
     ]);
-    res.json({ ok: true, pre: pre[0] || null, post: post[0] || null });
+    res.json({ ok: true, pre: preList, post: postList });
   });
 
   app.put('/api/bot/reminders', async (req, res) => {
@@ -206,8 +210,9 @@ function register(app) {
     if (typeof b.content !== 'string' || typeof b.offset_minutes !== 'number') {
       return res.status(400).json({ ok: false, error: 'invalid_params' });
     }
+    const name = b.name || (kind === 'pre_appointment' ? 'lembrete_pre' : 'lembrete_pos');
     await scheduled.upsertScheduledMessage(payload.tenant_id, {
-      name: kind === 'pre_appointment' ? 'lembrete_pre' : 'lembrete_pos',
+      name,
       trigger_type: kind,
       offset_minutes: b.offset_minutes,
       send_hour: '09:00',
@@ -270,6 +275,336 @@ function register(app) {
     if (tenant) invalidateKnowledgeCache(tenant.slug);
     res.json({ ok: true });
   });
+
+  // ===== Contatos do WhatsApp (sync do celular pareado) =====
+  app.get('/api/bot/whatsapp-contacts', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    const list = await whatsappContacts.listByTenant(payload.tenant_id, {
+      search: q,
+      limit: 50,
+    });
+    res.json({ ok: true, contacts: list });
+  });
+
+  app.get('/api/bot/whatsapp-contacts/count', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const count = await whatsappContacts.countByTenant(payload.tenant_id);
+    res.json({ ok: true, count });
+  });
+
+  // ===== Agendamento manual pelo dashboard (não passa pelo Claude) =====
+  app.post('/api/bot/appointments', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const body = req.body || {};
+    const kind = body.kind === 'block' ? 'block' : 'appointment';
+
+    const startIso = body.start_time;
+    if (!startIso) return res.status(400).json({ ok: false, error: 'missing_start_time' });
+
+    const tenant = await tenants.getById(payload.tenant_id);
+    if (!tenant) return res.status(404).json({ ok: false, error: 'tenant_not_found' });
+    const tz = tenant.timezone || 'America/Sao_Paulo';
+
+    let serviceId = null;
+    let durationMin = 30;
+    let customerId = null;
+    let customerPhone = null;
+    let customerName = body.customer_name || null;
+
+    if (kind === 'appointment') {
+      const { normalizePhone } = require('../utils/phone');
+      customerPhone = normalizePhone(body.customer_phone);
+      if (!customerPhone) return res.status(400).json({ ok: false, error: 'invalid_phone' });
+      if (!body.service_id) return res.status(400).json({ ok: false, error: 'missing_service' });
+
+      const svc = await services.getById(payload.tenant_id, body.service_id);
+      if (!svc) return res.status(400).json({ ok: false, error: 'service_not_found' });
+      serviceId = svc.id;
+      durationMin = svc.duration_minutes;
+
+      const customer = await customers.upsertByPhone(payload.tenant_id, customerPhone, {
+        name: customerName,
+      });
+      customerId = customer.id;
+      customerName = customer.name || customerName;
+    } else {
+      // Bloqueio: precisa de duration explícita
+      durationMin = typeof body.duration_minutes === 'number' ? body.duration_minutes : 30;
+      // Usa/cria um customer sistema pra bloqueios
+      const sysCustomer = await customers.upsertByPhone(payload.tenant_id, '55000000000000', {
+        name: '(bloqueio)',
+      });
+      customerId = sysCustomer.id;
+    }
+
+    const endIso = addMinutesIso(startIso, durationMin);
+
+    // Evento no Google Calendar (apenas pra appointments reais; pra bloqueios
+    // também criamos pra ocupar o calendário do profissional)
+    let googleEventId = null;
+    try {
+      const summary =
+        kind === 'block'
+          ? `Bloqueio ${body.notes ? '— ' + body.notes.slice(0, 40) : ''}`.trim()
+          : `${body.notes?.slice(0, 40) || 'Atendimento'} — ${customerName || ''}`.trim();
+      const description =
+        kind === 'block'
+          ? `Bloqueio criado via painel.${body.notes ? '\n\n' + body.notes : ''}`
+          : [
+              `Cliente: ${customerName || ''}`,
+              `Telefone: ${customerPhone || ''}`,
+              body.notes ? `Notas: ${body.notes}` : null,
+              '',
+              'Agendado via painel agenda-fácil.',
+            ]
+              .filter(Boolean)
+              .join('\n');
+      const event = await gcal.createEvent(payload.tenant_id, {
+        summary,
+        description,
+        startIso,
+        endIso,
+        timezone: tz,
+      });
+      googleEventId = event.id;
+    } catch (err) {
+      console.error('[dashboard-api] gcal create failed:', err.message);
+    }
+
+    const record = await appts.create({
+      tenantId: payload.tenant_id,
+      customerId,
+      serviceId,
+      startsAt: startIso,
+      endsAt: endIso,
+      googleEventId,
+      notes: body.notes || null,
+    });
+
+    if (kind === 'appointment' && customerPhone) {
+      await customers.updateLastAppointmentAt(customerId, startIso);
+      reminderEngine
+        .syncForAppointment(record.id)
+        .catch((err) => console.error('[dashboard-api] reminder sync failed:', err.message));
+    }
+
+    res.json({
+      ok: true,
+      appointment: {
+        id: record.id,
+        starts_at: startIso,
+        ends_at: endIso,
+        kind,
+        human_readable: humanDateTimeInTz(startIso, tz),
+      },
+    });
+  });
+
+  // ===== Reagendar =====
+  app.patch('/api/bot/appointments/:id', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const id = req.params.id;
+    const body = req.body || {};
+
+    const appt = await appts.getById(payload.tenant_id, id);
+    if (!appt) return res.status(404).json({ ok: false, error: 'not_found' });
+
+    const tenant = await tenants.getById(payload.tenant_id);
+    const tz = tenant.timezone || 'America/Sao_Paulo';
+    const oldStartsAt = appt.starts_at;
+
+    let startIso = appt.starts_at;
+    let endIso = appt.ends_at;
+
+    if (body.start_time) {
+      startIso = body.start_time;
+      const durationMs = new Date(appt.ends_at).getTime() - new Date(appt.starts_at).getTime();
+      const durationMin = Math.round(durationMs / 60000);
+      endIso = addMinutesIso(startIso, durationMin);
+
+      if (appt.google_event_id) {
+        try {
+          await gcal.updateEvent(payload.tenant_id, appt.google_event_id, {
+            start: { dateTime: startIso, timeZone: tz },
+            end: { dateTime: endIso, timeZone: tz },
+          });
+        } catch (err) {
+          console.error('[dashboard-api] gcal update failed:', err.message);
+        }
+      }
+      await appts.updateTimes(appt.id, startIso, endIso);
+
+      reminderEngine
+        .syncForAppointment(appt.id)
+        .catch((err) => console.error('[dashboard-api] reminder re-sync failed:', err.message));
+
+      // Notifica cliente sobre o reagendamento (AD)
+      notifyAppointmentChange(payload.tenant_id, appt.id, 'rescheduled', {
+        oldStartsAt,
+        newStartsAt: startIso,
+      }).catch((err) => console.error('[dashboard-api] notify failed:', err.message));
+    }
+
+    res.json({
+      ok: true,
+      appointment: {
+        id: appt.id,
+        starts_at: startIso,
+        ends_at: endIso,
+        human_readable: humanDateTimeInTz(startIso, tz),
+      },
+    });
+  });
+
+  // ===== Enviar mensagem manual pelo dashboard (AC) =====
+  app.post('/api/bot/send-message', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const { normalizePhone } = require('../utils/phone');
+    const phone = normalizePhone(req.body?.phone);
+    const text = req.body?.text;
+    if (!phone) return res.status(400).json({ ok: false, error: 'invalid_phone' });
+    if (typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ ok: false, error: 'empty_text' });
+    }
+    const jid = phoneToJid(phone);
+    if (!jid) return res.status(400).json({ ok: false, error: 'invalid_jid' });
+
+    try {
+      await wa.sendText(payload.tenant_id, jid, text.trim());
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: 'send_failed', detail: err.message });
+    }
+
+    await messageQueries.log({
+      tenantId: payload.tenant_id,
+      waMessageId: null,
+      phone,
+      direction: 'out',
+      body: text.trim(),
+    });
+
+    // Atualiza histórico da conversa pra refletir no dashboard
+    try {
+      const conv = (await conversations.get(payload.tenant_id, phone)) || { history: [] };
+      const history = Array.isArray(conv.history) ? conv.history : [];
+      history.push({ role: 'assistant', content: [{ type: 'text', text: text.trim() }] });
+      await conversations.upsert(payload.tenant_id, phone, { history: history.slice(-40) });
+    } catch (err) {
+      // best-effort
+    }
+
+    res.json({ ok: true });
+  });
+
+  // ===== Reviews / CSAT =====
+  app.get('/api/bot/reviews', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const { reviews } = require('@agenda-facil/db');
+    const [list, agg] = await Promise.all([
+      reviews.listByTenant(payload.tenant_id, { limit: 50 }),
+      reviews.aggregates(payload.tenant_id, { sinceDays: 90 }),
+    ]);
+    res.json({ ok: true, reviews: list, aggregates: agg });
+  });
+
+  // ===== Stats para home =====
+  app.get('/api/bot/stats', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const { reviews } = require('@agenda-facil/db');
+    const poolPkg = require('@agenda-facil/db').pool.getPool();
+
+    const [weekAppts, monthClients, csat] = await Promise.all([
+      poolPkg.query(
+        `SELECT COUNT(*)::int AS n FROM appointments
+         WHERE tenant_id = $1 AND status = 'confirmed'
+           AND starts_at >= NOW() - INTERVAL '7 days'`,
+        [payload.tenant_id],
+      ),
+      poolPkg.query(
+        `SELECT COUNT(*)::int AS n FROM customers
+         WHERE tenant_id = $1 AND created_at >= NOW() - INTERVAL '30 days'`,
+        [payload.tenant_id],
+      ),
+      reviews.aggregates(payload.tenant_id, { sinceDays: 30 }),
+    ]);
+    const cancelled = await poolPkg.query(
+      `SELECT COUNT(*)::int AS n FROM appointments
+       WHERE tenant_id = $1 AND status = 'cancelled'
+         AND starts_at >= NOW() - INTERVAL '30 days'`,
+      [payload.tenant_id],
+    );
+    const total30 = await poolPkg.query(
+      `SELECT COUNT(*)::int AS n FROM appointments
+       WHERE tenant_id = $1
+         AND starts_at >= NOW() - INTERVAL '30 days'`,
+      [payload.tenant_id],
+    );
+    const cancelRate =
+      total30.rows[0].n > 0 ? Math.round((cancelled.rows[0].n / total30.rows[0].n) * 100) : 0;
+
+    res.json({
+      ok: true,
+      stats: {
+        appointments_7d: weekAppts.rows[0].n,
+        new_customers_30d: monthClients.rows[0].n,
+        csat_30d: csat,
+        cancel_rate_30d_pct: cancelRate,
+      },
+    });
+  });
 }
+
+// Função helper pra notificar cliente em mudanças (AD)
+async function notifyAppointmentChange(tenantId, appointmentId, kind, data = {}) {
+  const appt = await appts.getDetailed(tenantId, appointmentId);
+  if (!appt) return;
+  const tenant = await tenants.getById(tenantId);
+  const tz = tenant?.timezone || 'America/Sao_Paulo';
+  const firstName = (appt.customer_name || '').split(' ')[0] || 'Olá';
+  const fmt = (iso) =>
+    new Date(iso).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: tz,
+    });
+
+  let text;
+  if (kind === 'cancelled') {
+    text = `Oi ${firstName}! Seu atendimento de ${fmt(appt.starts_at)} foi cancelado. Qualquer dúvida, é só me chamar. 🙌`;
+  } else if (kind === 'rescheduled') {
+    text = `Oi ${firstName}! Seu atendimento foi reagendado:\n\nDe: ${fmt(data.oldStartsAt)}\nPara: *${fmt(data.newStartsAt)}*\n\nAté lá! 💈`;
+  } else {
+    return;
+  }
+
+  const { phoneToJid } = require('../utils/phone');
+  const jid = phoneToJid(appt.customer_phone);
+  if (!jid) return;
+  try {
+    await wa.sendText(tenantId, jid, text);
+    await messageQueries.log({
+      tenantId,
+      waMessageId: null,
+      phone: appt.customer_phone,
+      direction: 'out',
+      body: text,
+    });
+  } catch (err) {
+    console.error('[notify] send failed:', err.message);
+  }
+}
+
+// Exporta pra uso pelas tools do Claude (que também chamam em cancel/reschedule)
+module.exports.notifyAppointmentChange = notifyAppointmentChange;
 
 module.exports = { register };

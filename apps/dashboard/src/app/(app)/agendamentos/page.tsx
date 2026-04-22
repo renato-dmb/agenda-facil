@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import { readSession } from '@/lib/auth';
 import { tenants, appointments } from '@agenda-facil/db';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { formatDateOnly, formatTimeOnly, formatPhone } from '@/lib/format';
 import { AppointmentRow } from './appointment-row';
 
@@ -32,9 +34,14 @@ export default async function AgendamentosPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Agendamentos</h1>
-        <p className="text-muted-foreground">{rows.length} no total (últimos 200)</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Agendamentos</h1>
+          <p className="text-muted-foreground">{rows.length} no total (últimos 200)</p>
+        </div>
+        <Button asChild>
+          <Link href="/agendamentos/novo">+ Novo</Link>
+        </Button>
       </div>
 
       {grouped.size === 0 && (
@@ -60,6 +67,7 @@ export default async function AgendamentosPage() {
                 phone={formatPhone(a.customer_phone)}
                 service={a.service_name || '—'}
                 status={a.status}
+                startsAtIso={a.starts_at}
               />
             ))}
           </CardContent>

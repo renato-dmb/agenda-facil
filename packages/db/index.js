@@ -12,4 +12,5 @@ module.exports = {
   authCodes: require('./queries/auth-codes'),
   knowledge: require('./queries/knowledge'),
   reviews: require('./queries/reviews'),
+  whatsappContacts: require('./queries/whatsapp-contacts'),
 };

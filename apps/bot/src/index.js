@@ -30,6 +30,7 @@ async function handleMessage(msg, { tenantId, tenant }) {
       case 'ignore':
       case 'silenced':
       case 'paused':
+      case 'bypass':
         return;
       default:
         console.warn(`[router:${tenant.slug}] unhandled mode: ${routed.mode}`);

@@ -132,6 +132,16 @@ async function setStatus(tenantId, status) {
   ]);
 }
 
+async function setAudienceMode(tenantId, mode) {
+  if (mode !== 'public' && mode !== 'private') {
+    throw new Error(`invalid audience_mode: ${mode}`);
+  }
+  await getPool().query(
+    `UPDATE tenants SET audience_mode = $1, updated_at = NOW() WHERE id = $2`,
+    [mode, tenantId],
+  );
+}
+
 module.exports = {
   getBySlug,
   getById,
@@ -143,5 +153,6 @@ module.exports = {
   setWhatsAppNumber,
   setOwnerPhone,
   setAiActive,
+  setAudienceMode,
   setStatus,
 };

@@ -8,4 +8,5 @@ module.exports = {
   messages: require('./queries/messages'),
   scheduled: require('./queries/scheduled'),
   services: require('./queries/services'),
+  contacts: require('./queries/contacts'),
 };

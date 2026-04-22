@@ -1,4 +1,9 @@
-const { scheduled, messages: messageQueries, customers } = require('@agenda-facil/db');
+const {
+  scheduled,
+  messages: messageQueries,
+  customers,
+  conversations,
+} = require('@agenda-facil/db');
 const wa = require('../whatsapp/baileys-manager');
 const { phoneToJid } = require('../utils/phone');
 
@@ -83,6 +88,24 @@ async function sendDue(limit = 20) {
         direction: 'out',
         body,
       });
+
+      // Pós-atendimento: injeta marker no histórico da conversa pra que, quando
+      // o cliente responder, o Claude saiba que está em modo CSAT.
+      if (item.trigger_type === 'post_appointment' && item.appointment_id) {
+        try {
+          const conv = (await conversations.get(item.tenant_id, item.phone)) || { history: [] };
+          const priorHistory = Array.isArray(conv.history) ? conv.history : [];
+          const marker = `[SISTEMA: pós-atendimento iniciado para appointment_id=${item.appointment_id} (serviço=${item.appt_service_name || 'atendimento'}, data=${item.appt_starts_at}). Coletar CSAT via submit_review.]`;
+          const newHistory = [
+            ...priorHistory,
+            { role: 'assistant', content: [{ type: 'text', text: body }] },
+            { role: 'user', content: marker },
+          ];
+          await conversations.upsert(item.tenant_id, item.phone, { history: newHistory });
+        } catch (err) {
+          console.error(`[dispatcher] failed to inject CSAT marker:`, err.message);
+        }
+      }
       sent += 1;
     } catch (err) {
       console.error(`[dispatcher] unexpected error on queue ${item.id}:`, err);

@@ -4,6 +4,7 @@ const rescheduleAppointment = require('./reschedule-appointment');
 const cancelAppointment = require('./cancel-appointment');
 const getCustomerHistory = require('./get-customer-history');
 const listServices = require('./list-services');
+const submitReview = require('./submit-review');
 
 const ALL_TOOLS = [
   listServices,
@@ -12,6 +13,7 @@ const ALL_TOOLS = [
   rescheduleAppointment,
   cancelAppointment,
   getCustomerHistory,
+  submitReview,
 ];
 
 function toolDefinitions() {

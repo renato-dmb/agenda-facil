@@ -32,8 +32,8 @@ export function RemindersClient({
       />
       <ReminderCard
         kind="post_appointment"
-        title="Pós-atendimento"
-        description="Follow-up após o cliente ser atendido. Bom pra pedir feedback ou sinalizar próximo retorno."
+        title="Pós-atendimento (pesquisa CSAT)"
+        description="Follow-up que abre a pesquisa de satisfação CSAT. O bot coleta nota 1-5, comentário livre e interesse em retorno. Se o cliente quiser retorno, sugere horários automaticamente."
         direction="depois"
         defaultMinutes={120}
         initial={initialPost}

@@ -43,7 +43,7 @@ export default async function LembretesPage() {
     ? toTemplate(postList[0])
     : {
         content:
-          'Oi {first_name}! Espero que tenha gostado do atendimento 💈 Se puder deixar uma mensagem aqui com seu feedback, ajuda demais a gente. Obrigado!',
+          'Oi {first_name}! 💈 Aqui é pra saber como foi seu atendimento hoje.\n\nDe *1 a 5*, como você avalia o {service} que fizemos?\n(1 = péssimo, 5 = excelente)\n\nDepois me conta se tem algum comentário e se você quer já marcar o retorno pra daqui a algumas semanas!',
         offset_minutes: 120,
         active: false,
       };

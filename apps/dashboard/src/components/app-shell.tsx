@@ -12,6 +12,7 @@ import {
   Star,
   Megaphone,
   Clock,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: '/home', label: 'Início', icon: Home },
+  { href: '/buscar', label: 'Buscar', icon: Search },
   { href: '/agendamentos', label: 'Agenda', icon: Calendar },
   { href: '/conversas', label: 'Conversas', icon: MessageCircle },
   { href: '/clientes', label: 'Clientes', icon: Users },

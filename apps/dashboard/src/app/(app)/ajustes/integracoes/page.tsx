@@ -55,10 +55,15 @@ export default async function IntegracoesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            A reconexão é manual via script (oauth-setup). Esta integração direta pelo dashboard
-            entra na próxima fase.
-          </p>
+          <Button asChild variant="outline">
+            <a
+              href={`${BOT_PUBLIC_URL || ''}/oauth/google/start?slug=${tenant.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {gcalToken ? 'Reconectar Google Calendar' : 'Conectar Google Calendar'}
+            </a>
+          </Button>
         </CardContent>
       </Card>
 

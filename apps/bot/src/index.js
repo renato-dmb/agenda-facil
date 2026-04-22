@@ -69,12 +69,47 @@ async function bootstrap() {
   const app = express();
   app.use(express.json({ limit: '256kb' }));
 
+  // Rate limit global simples por IP (defesa contra DoS/abuso)
+  const rateBuckets = new Map();
+  const RATE_WINDOW_MS = 60_000;
+  const RATE_MAX = 120; // 120 req/min/IP é generoso pra UX real
+  app.use((req, res, next) => {
+    if (req.path === '/health' || req.path.startsWith('/pair/')) return next();
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const now = Date.now();
+    const b = rateBuckets.get(ip);
+    if (!b || now >= b.resetAt) {
+      rateBuckets.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+      return next();
+    }
+    if (b.count >= RATE_MAX) {
+      res.set('Retry-After', Math.ceil((b.resetAt - now) / 1000));
+      return res.status(429).json({ ok: false, error: 'rate_limited' });
+    }
+    b.count += 1;
+    next();
+  });
+
   app.get('/health', (_req, res) => {
     res.json({
       ok: true,
       tenants: wa.listConnected(),
       time: new Date().toISOString(),
     });
+  });
+
+  // Inicia OAuth Google — redireciona pro consent screen do Google
+  app.get('/oauth/google/start', async (req, res) => {
+    try {
+      const slug = String(req.query.slug || '');
+      const t = await tenants.getBySlug(slug);
+      if (!t) return res.status(404).send('tenant not found');
+      const { generateAuthUrl } = require('./integrations/google-calendar/oauth');
+      const url = generateAuthUrl(slug);
+      return res.redirect(url);
+    } catch (err) {
+      return res.status(500).send('error: ' + err.message);
+    }
   });
 
   // ===== Auth (magic code via WhatsApp) =====

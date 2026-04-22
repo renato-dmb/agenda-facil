@@ -7,6 +7,7 @@ import {
   BookOpen,
   Plug,
   Bell,
+  Download,
 } from 'lucide-react';
 
 const SECTIONS = [
@@ -45,6 +46,12 @@ const SECTIONS = [
     title: 'Integrações',
     description: 'WhatsApp + Google Calendar + pausar/retomar bot',
     icon: Plug,
+  },
+  {
+    href: '/ajustes/exportar',
+    title: 'Exportar dados',
+    description: 'Baixe CSV de clientes, agendamentos e avaliações',
+    icon: Download,
   },
 ];
 

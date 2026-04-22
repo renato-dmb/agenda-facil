@@ -4,6 +4,15 @@ import { readSession } from '@/lib/auth';
 import { tenants, customers, appointments } from '@agenda-facil/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPhone, formatDateTime } from '@/lib/format';
+import { CustomerForm } from './customer-form';
+
+type CustomerRow = {
+  id: string;
+  name: string | null;
+  phone: string;
+  email: string | null;
+  birthday: string | null;
+};
 
 export default async function CustomerDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,7 +21,7 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
   const tenant = await tenants.getById(session.tenant_id);
   if (!tenant) redirect('/login');
 
-  const customer = await customers.getById(tenant.id, id);
+  const customer = (await customers.getById(tenant.id, id)) as CustomerRow | null;
   if (!customer) notFound();
 
   const history = (await appointments.listByCustomer(tenant.id, id)) as Array<{
@@ -20,6 +29,11 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
     starts_at: string;
     status: string;
   }>;
+
+  // normaliza birthday pra ISO YYYY-MM-DD (Postgres retorna como Date)
+  const birthdayStr = customer.birthday
+    ? new Date(customer.birthday).toISOString().slice(0, 10)
+    : '';
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -30,6 +44,15 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
         <h1 className="mt-2 text-2xl font-semibold">{customer.name || '(sem nome)'}</h1>
         <p className="text-muted-foreground">{formatPhone(customer.phone)}</p>
       </div>
+
+      <CustomerForm
+        id={customer.id}
+        initial={{
+          name: customer.name || '',
+          email: customer.email || '',
+          birthday: birthdayStr,
+        }}
+      />
 
       <Card>
         <CardHeader>

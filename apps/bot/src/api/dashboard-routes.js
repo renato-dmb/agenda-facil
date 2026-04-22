@@ -780,6 +780,100 @@ function register(app) {
     res.json({ ok: true, reviews: list, aggregates: agg });
   });
 
+  // ===== Exportar CSV =====
+  function csvEscape(v) {
+    if (v == null) return '';
+    const s = String(v);
+    if (s.includes('"') || s.includes(',') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  function sendCsv(res, filename, rows) {
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(rows.map((r) => r.map(csvEscape).join(',')).join('\n'));
+  }
+
+  app.get('/api/bot/export/customers', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const p = pool.getPool();
+    const r = await p.query(
+      `SELECT name, phone, email, birthday, last_appointment_at, created_at
+       FROM customers WHERE tenant_id = $1 ORDER BY name NULLS LAST`,
+      [payload.tenant_id],
+    );
+    const rows = [['nome', 'telefone', 'email', 'aniversario', 'ultimo_atendimento', 'criado_em']];
+    for (const row of r.rows) {
+      rows.push([
+        row.name || '',
+        row.phone,
+        row.email || '',
+        row.birthday ? new Date(row.birthday).toISOString().slice(0, 10) : '',
+        row.last_appointment_at ? new Date(row.last_appointment_at).toISOString() : '',
+        new Date(row.created_at).toISOString(),
+      ]);
+    }
+    sendCsv(res, 'clientes.csv', rows);
+  });
+
+  app.get('/api/bot/export/appointments', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const p = pool.getPool();
+    const r = await p.query(
+      `SELECT a.starts_at, a.ends_at, a.status, c.name AS customer, c.phone,
+              s.name AS service, s.price_cents
+       FROM appointments a
+       LEFT JOIN customers c ON c.id = a.customer_id
+       LEFT JOIN services s ON s.id = a.service_id
+       WHERE a.tenant_id = $1 ORDER BY a.starts_at DESC`,
+      [payload.tenant_id],
+    );
+    const rows = [['inicio', 'fim', 'status', 'cliente', 'telefone', 'servico', 'preco_reais']];
+    for (const row of r.rows) {
+      rows.push([
+        new Date(row.starts_at).toISOString(),
+        new Date(row.ends_at).toISOString(),
+        row.status,
+        row.customer || '',
+        row.phone || '',
+        row.service || '',
+        row.price_cents != null ? (row.price_cents / 100).toFixed(2) : '',
+      ]);
+    }
+    sendCsv(res, 'agendamentos.csv', rows);
+  });
+
+  app.get('/api/bot/export/reviews', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const p = pool.getPool();
+    const r = await p.query(
+      `SELECT r.score, r.comment, r.wants_return, r.return_interval_days, r.created_at,
+              c.name AS customer_name, c.phone AS customer_phone
+       FROM appointment_reviews r
+       LEFT JOIN customers c ON c.id = r.customer_id
+       WHERE r.tenant_id = $1 ORDER BY r.created_at DESC`,
+      [payload.tenant_id],
+    );
+    const rows = [['data', 'nota', 'comentario', 'quer_retornar', 'intervalo_dias', 'cliente', 'telefone']];
+    for (const row of r.rows) {
+      rows.push([
+        new Date(row.created_at).toISOString(),
+        row.score,
+        row.comment || '',
+        row.wants_return === true ? 'sim' : row.wants_return === false ? 'nao' : '',
+        row.return_interval_days || '',
+        row.customer_name || '',
+        row.customer_phone || '',
+      ]);
+    }
+    sendCsv(res, 'avaliacoes.csv', rows);
+  });
+
   // ===== Stats para home =====
   app.get('/api/bot/stats', async (req, res) => {
     const payload = await auth(req, res);

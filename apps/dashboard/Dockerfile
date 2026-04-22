@@ -43,6 +43,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3002
+ENV HOSTNAME=0.0.0.0
 
 # Next standalone output já inclui server.js + node_modules mínimos
 COPY --from=builder /app/apps/dashboard/.next/standalone ./

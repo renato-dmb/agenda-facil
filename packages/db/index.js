@@ -9,4 +9,5 @@ module.exports = {
   scheduled: require('./queries/scheduled'),
   services: require('./queries/services'),
   contacts: require('./queries/contacts'),
+  authCodes: require('./queries/auth-codes'),
 };

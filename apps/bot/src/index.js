@@ -13,6 +13,7 @@ const { exchangeCodeForTokens } = require('./integrations/google-calendar/oauth'
 const { googleOAuth, tenants } = require('@agenda-facil/db');
 const { AUTH_ROOT } = require('./whatsapp/session-store');
 const { google } = require('googleapis');
+const magicCode = require('./auth/magic-code');
 
 const PORT = Number(process.env.PORT) || 3001;
 
@@ -73,6 +74,23 @@ async function bootstrap() {
       tenants: wa.listConnected(),
       time: new Date().toISOString(),
     });
+  });
+
+  // ===== Auth (magic code via WhatsApp) =====
+  app.post('/api/auth/request-code', async (req, res) => {
+    const phone = req.body?.phone;
+    if (!phone) return res.status(400).json({ ok: false, error: 'missing_phone' });
+    const result = await magicCode.requestCode({ rawPhone: phone });
+    const status = result.ok ? 200 : result.error === 'rate_limited' ? 429 : 400;
+    return res.status(status).json(result);
+  });
+
+  app.post('/api/auth/verify-code', async (req, res) => {
+    const { phone, code } = req.body || {};
+    if (!phone || !code) return res.status(400).json({ ok: false, error: 'missing_fields' });
+    const result = await magicCode.verifyCode({ rawPhone: phone, code });
+    const status = result.ok ? 200 : 401;
+    return res.status(status).json(result);
   });
 
   // Pareamento remoto do WhatsApp — QR no navegador. Essencial em produção,

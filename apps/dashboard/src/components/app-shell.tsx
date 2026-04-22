@@ -13,6 +13,7 @@ import {
   Megaphone,
   Clock,
   Search,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,7 @@ const NAV: NavItem[] = [
   { href: '/conversas', label: 'Conversas', icon: MessageCircle },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/reviews', label: 'Avaliações', icon: Star },
+  { href: '/relatorios', label: 'Relatórios', icon: BarChart3 },
   { href: '/lista-espera', label: 'Espera', icon: Clock },
   { href: '/campanhas', label: 'Campanhas', icon: Megaphone },
   { href: '/contatos', label: 'Contatos', icon: UserCog },

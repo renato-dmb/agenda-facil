@@ -1,5 +1,6 @@
 const gcal = require('../../integrations/google-calendar/events');
 const { appointments } = require('@agenda-facil/db');
+const { removeForAppointment } = require('../../scheduler/appointment-reminders');
 
 const definition = {
   name: 'cancel_appointment',
@@ -34,6 +35,7 @@ async function execute(input, context) {
     }
   }
   await appointments.setStatus(appt.id, 'cancelled');
+  await removeForAppointment(appt.id).catch(() => {});
 
   return {
     appointment_id: appt.id,

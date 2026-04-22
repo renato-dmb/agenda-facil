@@ -6,17 +6,57 @@ function renderTemplate(tpl, vars) {
   return tpl.replace(/\{(\w+)\}/g, (_, key) => (key in vars ? String(vars[key]) : `{${key}}`));
 }
 
+function formatDatePtBr(iso, tz) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: tz || 'America/Sao_Paulo',
+  });
+}
+
+function formatTimePtBr(iso, tz) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: tz || 'America/Sao_Paulo',
+  });
+}
+
+function weekdayPtBr(iso, tz) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    timeZone: tz || 'America/Sao_Paulo',
+  });
+}
+
 async function sendDue(limit = 20) {
   const pending = await scheduled.listPending(limit);
   let sent = 0;
 
   for (const item of pending) {
     try {
+      // Se é lembrete atrelado a appointment e o appointment foi cancelado,
+      // não envia e remove da fila (defesa em profundidade).
+      if (item.appointment_id && item.appt_status === 'cancelled') {
+        await scheduled.markSent(item.id);
+        console.log(`[dispatcher] skipped queue ${item.id} — appointment cancelled`);
+        continue;
+      }
+
       const customer = await customers.getByPhone(item.tenant_id, item.phone);
-      const body = renderTemplate(item.content, {
+      const tz = item.tenant_tz || 'America/Sao_Paulo';
+      const vars = {
         nome: customer?.name || '',
         first_name: customer?.name?.split(' ')[0] || '',
-      });
+        service: item.appt_service_name || '',
+        date: formatDatePtBr(item.appt_starts_at, tz),
+        time: formatTimePtBr(item.appt_starts_at, tz),
+        weekday: weekdayPtBr(item.appt_starts_at, tz),
+      };
+      const body = renderTemplate(item.content, vars);
 
       const jid = phoneToJid(item.phone);
       if (!jid) {

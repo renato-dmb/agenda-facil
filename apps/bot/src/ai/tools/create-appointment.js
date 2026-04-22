@@ -1,6 +1,7 @@
 const gcal = require('../../integrations/google-calendar/events');
 const { services, customers, appointments } = require('@agenda-facil/db');
 const { addMinutesIso, humanDateTimeInTz } = require('../../utils/dates');
+const { syncForAppointment } = require('../../scheduler/appointment-reminders');
 
 const definition = {
   name: 'create_appointment',
@@ -74,6 +75,11 @@ async function execute(input, context) {
   });
 
   await customers.updateLastAppointmentAt(customer.id, input.start_time);
+
+  // Enfileira lembretes pré/pós (silenciosamente ignora se templates não existem)
+  syncForAppointment(record.id).catch((err) =>
+    console.error(`[create_appointment:${tenant.slug}] reminder sync failed:`, err.message),
+  );
 
   return {
     appointment_id: record.id,

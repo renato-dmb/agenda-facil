@@ -184,6 +184,40 @@ function register(app) {
     res.json({ ok: true });
   });
 
+  // ===== Lembretes pré/pós-atendimento =====
+  app.get('/api/bot/reminders', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const [pre, post] = await Promise.all([
+      scheduled.listByTriggerType(payload.tenant_id, 'pre_appointment'),
+      scheduled.listByTriggerType(payload.tenant_id, 'post_appointment'),
+    ]);
+    res.json({ ok: true, pre: pre[0] || null, post: post[0] || null });
+  });
+
+  app.put('/api/bot/reminders', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const b = req.body || {};
+    const kind = b.kind;
+    if (kind !== 'pre_appointment' && kind !== 'post_appointment') {
+      return res.status(400).json({ ok: false, error: 'invalid_kind' });
+    }
+    if (typeof b.content !== 'string' || typeof b.offset_minutes !== 'number') {
+      return res.status(400).json({ ok: false, error: 'invalid_params' });
+    }
+    await scheduled.upsertScheduledMessage(payload.tenant_id, {
+      name: kind === 'pre_appointment' ? 'lembrete_pre' : 'lembrete_pos',
+      trigger_type: kind,
+      offset_minutes: b.offset_minutes,
+      send_hour: '09:00',
+      content_type: 'template',
+      content: b.content.trim(),
+      active: b.active !== false,
+    });
+    res.json({ ok: true });
+  });
+
   // ===== Recorrência =====
   app.post('/api/bot/recurrence', async (req, res) => {
     const payload = await auth(req, res);

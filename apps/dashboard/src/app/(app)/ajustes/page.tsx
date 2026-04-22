@@ -6,6 +6,7 @@ import {
   Repeat,
   BookOpen,
   Plug,
+  Bell,
 } from 'lucide-react';
 
 const SECTIONS = [
@@ -26,6 +27,12 @@ const SECTIONS = [
     title: 'Recorrência',
     description: 'Mensagens automáticas para clientes que sumiram',
     icon: Repeat,
+  },
+  {
+    href: '/ajustes/lembretes',
+    title: 'Lembretes',
+    description: 'Confirmação pré-atendimento + follow-up pós',
+    icon: Bell,
   },
   {
     href: '/ajustes/conhecimento',

@@ -1,6 +1,7 @@
 const gcal = require('../../integrations/google-calendar/events');
 const { appointments } = require('@agenda-facil/db');
 const { addMinutesIso, humanDateTimeInTz } = require('../../utils/dates');
+const { syncForAppointment } = require('../../scheduler/appointment-reminders');
 
 const definition = {
   name: 'reschedule_appointment',
@@ -40,6 +41,11 @@ async function execute(input, context) {
   }
 
   await appointments.updateTimes(appt.id, input.new_start_time, newEndIso);
+
+  // Atualiza horários dos lembretes para o novo starts_at/ends_at
+  syncForAppointment(appt.id).catch((err) =>
+    console.error(`[reschedule_appointment:${tenant.slug}] reminder sync failed:`, err.message),
+  );
 
   return {
     appointment_id: appt.id,

@@ -52,4 +52,18 @@ async function setState(tenantId, phone, state) {
   );
 }
 
-module.exports = { get, upsert, setState };
+async function listByTenant(tenantId, { limit = 100 } = {}) {
+  const { rows } = await getPool().query(
+    `SELECT c.*, cust.name AS customer_name
+     FROM conversations c
+     LEFT JOIN customers cust
+       ON cust.tenant_id = c.tenant_id AND cust.phone = c.phone
+     WHERE c.tenant_id = $1
+     ORDER BY c.updated_at DESC
+     LIMIT $2`,
+    [tenantId, limit],
+  );
+  return rows;
+}
+
+module.exports = { get, upsert, setState, listByTenant };

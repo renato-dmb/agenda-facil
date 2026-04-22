@@ -28,6 +28,31 @@ async function updateLastAppointmentAt(customerId, timestamp) {
   ]);
 }
 
+async function listByTenant(tenantId, { limit = 500, search } = {}) {
+  const params = [tenantId];
+  let where = 'WHERE tenant_id = $1';
+  if (search && search.trim()) {
+    params.push(`%${search.trim()}%`);
+    where += ` AND (name ILIKE $${params.length} OR phone ILIKE $${params.length})`;
+  }
+  params.push(limit);
+  const { rows } = await getPool().query(
+    `SELECT * FROM customers ${where}
+     ORDER BY last_appointment_at DESC NULLS LAST, created_at DESC
+     LIMIT $${params.length}`,
+    params,
+  );
+  return rows;
+}
+
+async function getById(tenantId, id) {
+  const { rows } = await getPool().query(
+    `SELECT * FROM customers WHERE tenant_id = $1 AND id = $2`,
+    [tenantId, id],
+  );
+  return rows[0] || null;
+}
+
 async function listEligibleForRecurrence(tenantId, triggerDays) {
   const { rows } = await getPool().query(
     `SELECT c.* FROM customers c
@@ -43,4 +68,11 @@ async function listEligibleForRecurrence(tenantId, triggerDays) {
   return rows;
 }
 
-module.exports = { getByPhone, upsertByPhone, updateLastAppointmentAt, listEligibleForRecurrence };
+module.exports = {
+  getByPhone,
+  upsertByPhone,
+  updateLastAppointmentAt,
+  listEligibleForRecurrence,
+  listByTenant,
+  getById,
+};

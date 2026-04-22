@@ -28,4 +28,15 @@ async function hasInboundSince(tenantId, phone, sinceIso) {
   return rows.length > 0;
 }
 
-module.exports = { hasMessage, log, hasInboundSince };
+async function listByPhone(tenantId, phone, { limit = 100 } = {}) {
+  const { rows } = await getPool().query(
+    `SELECT * FROM message_log
+     WHERE tenant_id = $1 AND phone = $2
+     ORDER BY created_at DESC
+     LIMIT $3`,
+    [tenantId, phone, limit],
+  );
+  return rows.reverse();
+}
+
+module.exports = { hasMessage, log, hasInboundSince, listByPhone };

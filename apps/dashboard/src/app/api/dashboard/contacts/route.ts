@@ -1,0 +1,17 @@
+import { NextResponse } from 'next/server';
+import { botCall } from '@/lib/bot-client';
+
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => ({}));
+  const result = await botCall('POST', '/api/bot/contacts', {
+    phone: body.phone,
+    name: body.name,
+  });
+  return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+}
+
+export async function DELETE(req: Request) {
+  const body = await req.json().catch(() => ({}));
+  const result = await botCall('DELETE', '/api/bot/contacts', { phone: body.phone });
+  return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+}

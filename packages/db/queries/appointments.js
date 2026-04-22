@@ -62,4 +62,46 @@ async function listUpcomingBetween(tenantId, fromIso, toIso) {
   return rows;
 }
 
-module.exports = { create, getById, updateTimes, setStatus, listByCustomer, listUpcomingBetween };
+async function listByTenant(tenantId, { limit = 200, status } = {}) {
+  const params = [tenantId];
+  let where = 'WHERE a.tenant_id = $1';
+  if (status) {
+    params.push(status);
+    where += ` AND a.status = $${params.length}`;
+  }
+  params.push(limit);
+  const { rows } = await getPool().query(
+    `SELECT a.*, c.name AS customer_name, c.phone AS customer_phone, s.name AS service_name
+     FROM appointments a
+     LEFT JOIN customers c ON c.id = a.customer_id
+     LEFT JOIN services s ON s.id = a.service_id
+     ${where}
+     ORDER BY a.starts_at DESC
+     LIMIT $${params.length}`,
+    params,
+  );
+  return rows;
+}
+
+async function getDetailed(tenantId, id) {
+  const { rows } = await getPool().query(
+    `SELECT a.*, c.name AS customer_name, c.phone AS customer_phone, s.name AS service_name
+     FROM appointments a
+     LEFT JOIN customers c ON c.id = a.customer_id
+     LEFT JOIN services s ON s.id = a.service_id
+     WHERE a.tenant_id = $1 AND a.id = $2`,
+    [tenantId, id],
+  );
+  return rows[0] || null;
+}
+
+module.exports = {
+  create,
+  getById,
+  updateTimes,
+  setStatus,
+  listByCustomer,
+  listUpcomingBetween,
+  listByTenant,
+  getDetailed,
+};

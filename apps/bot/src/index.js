@@ -14,6 +14,7 @@ const { googleOAuth, tenants } = require('@agenda-facil/db');
 const { AUTH_ROOT } = require('./whatsapp/session-store');
 const { google } = require('googleapis');
 const magicCode = require('./auth/magic-code');
+const dashboardRoutes = require('./api/dashboard-routes');
 
 const PORT = Number(process.env.PORT) || 3001;
 
@@ -92,6 +93,9 @@ async function bootstrap() {
     const status = result.ok ? 200 : 401;
     return res.status(status).json(result);
   });
+
+  // ===== API autenticada pro dashboard =====
+  dashboardRoutes.register(app);
 
   // Pareamento remoto do WhatsApp — QR no navegador. Essencial em produção,
   // onde não há terminal do container.

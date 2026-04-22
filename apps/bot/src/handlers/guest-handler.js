@@ -3,6 +3,7 @@ const { conversations, messages, services } = require('@agenda-facil/db');
 const { chatGuest } = require('../ai/claude');
 const { loadKnowledge } = require('../knowledge/loader');
 const { config } = require('@agenda-facil/shared');
+const whisper = require('../audio/whisper');
 
 const rateLimitBuckets = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
@@ -57,20 +58,50 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
     return { mode: 'rate_limited' };
   }
 
+  let effectiveText = text;
+  let transcribedFrom = null;
+
+  // Transcrição de áudio via Whisper. Se desabilitado ou falhar, responde
+  // placeholder pedindo pra escrever.
+  if ((!effectiveText || !effectiveText.trim()) && wa.isAudioMessage(msg) && whisper.isEnabled()) {
+    try {
+      const transcript = await whisper.transcribe(msg);
+      if (transcript && transcript.trim()) {
+        effectiveText = `[áudio transcrito]: ${transcript.trim()}`;
+        transcribedFrom = transcript.trim();
+        console.log(`[whisper:${tenant.slug}] ${phone}: "${transcript.slice(0, 80)}"`);
+      }
+    } catch (err) {
+      if (err.name === 'AudioTooLargeError') {
+        try {
+          await wa.sendText(tenantId, chatJid, err.userMessage);
+        } catch {
+          // best effort
+        }
+        await messages.log({
+          tenantId,
+          waMessageId: null,
+          phone,
+          direction: 'out',
+          body: err.userMessage,
+        });
+        return { mode: 'audio_too_large' };
+      }
+      console.error(`[whisper:${tenant.slug}] transcription failed:`, err.message);
+    }
+  }
+
   await messages.log({
     tenantId,
     waMessageId: messageId,
     phone,
     direction: 'in',
-    body: text,
+    body: transcribedFrom || text || '',
   });
 
-  // Mensagens sem texto (áudios, figurinhas, reações) ainda não são processadas —
-  // Whisper fica no roadmap da Fase 3. Respondemos placeholder educado e NÃO
-  // chamamos Claude (conteúdo vazio no histórico quebra a próxima chamada).
-  if (!text || !text.trim()) {
+  if (!effectiveText || !effectiveText.trim()) {
     const polite =
-      'Oi! Por enquanto eu só consigo responder por texto — áudios e figurinhas ainda não. Pode me escrever, por favor? 😊';
+      'Oi! Tive um problema pra ouvir seu áudio agora. Pode me mandar em texto, por favor? 😊';
     try {
       await wa.sendText(tenantId, chatJid, polite);
       await wa.markRead(tenantId, msg);
@@ -85,7 +116,7 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
   const priorHistory = Array.isArray(conv.history) ? conv.history : [];
   const isFirstContact = priorHistory.length === 0;
 
-  const userMessage = { role: 'user', content: text };
+  const userMessage = { role: 'user', content: effectiveText };
   const historyWithUser = [...priorHistory, userMessage];
 
   await conversations.upsert(tenantId, phone, { history: historyWithUser });

@@ -16,6 +16,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 
 type NavItem = {
@@ -86,10 +87,11 @@ export function AppShell({
             );
           })}
         </nav>
-        <div className="mt-auto">
-          <Button variant="ghost" className="w-full justify-start" onClick={logout}>
+        <div className="mt-auto flex items-center gap-1">
+          <Button variant="ghost" className="flex-1 justify-start" onClick={logout}>
             Sair
           </Button>
+          <ThemeToggle />
         </div>
       </aside>
 
@@ -100,9 +102,12 @@ export function AppShell({
             <p className="text-xs uppercase tracking-wider text-muted-foreground">agenda-fácil</p>
             <p className="text-sm font-semibold">{tenantName}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={logout}>
-            Sair
-          </Button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <Button variant="ghost" size="sm" onClick={logout}>
+              Sair
+            </Button>
+          </div>
         </header>
 
         <main className="flex-1 p-4 pb-24 md:p-8 md:pb-8">{children}</main>

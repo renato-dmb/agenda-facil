@@ -6,12 +6,20 @@ const {
   services,
   scheduled,
   knowledge,
+  whatsappContacts,
+  customers,
+  messages: messageQueries,
+  reviews,
+  pool,
 } = require('@agenda-facil/db');
 const { verifyToken } = require('../auth/magic-code');
 const resolver = require('../tenancy/resolver');
-const { normalizePhone, brMobileVariants } = require('../utils/phone');
+const { normalizePhone, brMobileVariants, phoneToJid } = require('../utils/phone');
+const { addMinutesIso, humanDateTimeInTz } = require('../utils/dates');
 const gcal = require('../integrations/google-calendar/events');
 const { invalidate: invalidateKnowledgeCache } = require('../knowledge/loader');
+const wa = require('../whatsapp/baileys-manager');
+const reminderEngine = require('../scheduler/appointment-reminders');
 
 async function auth(req, res) {
   const header = req.header('authorization') || '';
@@ -26,6 +34,17 @@ async function auth(req, res) {
     return null;
   }
   return result.payload;
+}
+
+async function requireSuperAdmin(req, res) {
+  const payload = await auth(req, res);
+  if (!payload) return null;
+  const t = await tenants.getById(payload.tenant_id);
+  if (!t?.is_super_admin) {
+    res.status(403).json({ ok: false, error: 'forbidden' });
+    return null;
+  }
+  return payload;
 }
 
 function register(app) {
@@ -273,6 +292,253 @@ function register(app) {
     await knowledge.upsertSection(payload.tenant_id, section, content);
     const tenant = await tenants.getById(payload.tenant_id);
     if (tenant) invalidateKnowledgeCache(tenant.slug);
+    res.json({ ok: true });
+  });
+
+  // ===== Super Admin (N) =====
+  app.get('/api/bot/admin/tenants', async (req, res) => {
+    const payload = await requireSuperAdmin(req, res);
+    if (!payload) return;
+    const list = await tenants.listAll();
+    res.json({ ok: true, tenants: list });
+  });
+
+  app.post('/api/bot/admin/tenants', async (req, res) => {
+    const payload = await requireSuperAdmin(req, res);
+    if (!payload) return;
+    const b = req.body || {};
+    if (!b.slug || !b.name || !b.profession_type || !b.owner_phone) {
+      return res.status(400).json({ ok: false, error: 'missing_fields' });
+    }
+    const ownerPhone = normalizePhone(b.owner_phone);
+    if (!ownerPhone) return res.status(400).json({ ok: false, error: 'invalid_phone' });
+    try {
+      const t = await tenants.createNew({
+        slug: String(b.slug).toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        name: b.name,
+        profession_type: b.profession_type,
+        timezone: b.timezone || 'America/Sao_Paulo',
+        owner_phone: ownerPhone,
+      });
+      res.json({ ok: true, tenant: t });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: 'create_failed', detail: err.message });
+    }
+  });
+
+  // ===== Onboarding (D) =====
+  app.get('/api/bot/onboarding-status', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const [svcList, hoursList, gcalToken] = await Promise.all([
+      services.listActive(payload.tenant_id),
+      services.listBusinessHours(payload.tenant_id),
+      require('@agenda-facil/db').googleOAuth.getByTenantId(payload.tenant_id),
+    ]);
+    const tenant = await tenants.getById(payload.tenant_id);
+    const whatsappConnected = wa.listConnected().some((c) => c.tenantId === payload.tenant_id);
+    res.json({
+      ok: true,
+      status: tenant?.status,
+      checks: {
+        has_services: svcList.length > 0,
+        has_hours: hoursList.length > 0,
+        has_gcal: !!gcalToken,
+        has_whatsapp: whatsappConnected,
+      },
+    });
+  });
+
+  app.post('/api/bot/onboarding/activate', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    await tenants.setStatus(payload.tenant_id, 'active');
+    await resolver.refreshTenant(payload.tenant_id);
+    res.json({ ok: true });
+  });
+
+  // ===== Campanhas manuais (M) =====
+  app.post('/api/bot/broadcast', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const b = req.body || {};
+    const text = typeof b.text === 'string' ? b.text.trim() : '';
+    if (!text) return res.status(400).json({ ok: false, error: 'empty_text' });
+
+    const recipients = Array.isArray(b.phones) ? b.phones : [];
+    const filter = b.filter;
+    const poolPkg = pool.getPool();
+    let phones = [];
+
+    if (recipients.length > 0) {
+      phones = recipients;
+    } else if (filter === 'all_customers') {
+      const r = await poolPkg.query(
+        `SELECT phone FROM customers WHERE tenant_id = $1 AND phone NOT LIKE '5500%'`,
+        [payload.tenant_id],
+      );
+      phones = r.rows.map((x) => x.phone);
+    } else if (filter === 'active_last_60d') {
+      const r = await poolPkg.query(
+        `SELECT phone FROM customers WHERE tenant_id = $1 AND phone NOT LIKE '5500%'
+           AND last_appointment_at >= NOW() - INTERVAL '60 days'`,
+        [payload.tenant_id],
+      );
+      phones = r.rows.map((x) => x.phone);
+    } else if (filter === 'inactive_30d') {
+      const r = await poolPkg.query(
+        `SELECT phone FROM customers WHERE tenant_id = $1 AND phone NOT LIKE '5500%'
+           AND (last_appointment_at IS NULL OR last_appointment_at < NOW() - INTERVAL '30 days')`,
+        [payload.tenant_id],
+      );
+      phones = r.rows.map((x) => x.phone);
+    }
+
+    const unique = Array.from(new Set(phones)).filter(Boolean);
+    let sent = 0;
+    let failed = 0;
+    for (const phone of unique) {
+      const jid = phoneToJid(phone);
+      if (!jid) continue;
+      try {
+        const customer = await customers.getByPhone(payload.tenant_id, phone);
+        const body = text
+          .replace(/\{first_name\}/gi, customer?.name?.split(' ')[0] || '')
+          .replace(/\{nome\}/gi, customer?.name || '');
+        await wa.sendText(payload.tenant_id, jid, body);
+        await messageQueries.log({
+          tenantId: payload.tenant_id,
+          waMessageId: null,
+          phone,
+          direction: 'out',
+          body,
+        });
+        sent += 1;
+        await new Promise((r) => setTimeout(r, 2500));
+      } catch (err) {
+        failed += 1;
+      }
+    }
+    res.json({ ok: true, sent, failed, total: unique.length });
+  });
+
+  // ===== Customers (U — birthday edit) =====
+  app.patch('/api/bot/customers/:id', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const id = req.params.id;
+    const b = req.body || {};
+    const poolPkg = pool.getPool();
+    const sets = [];
+    const values = [payload.tenant_id, id];
+    let i = 3;
+    if (typeof b.name === 'string') {
+      sets.push(`name = $${i}`);
+      values.push(b.name.trim());
+      i += 1;
+    }
+    if (typeof b.email === 'string') {
+      sets.push(`email = $${i}`);
+      values.push(b.email.trim() || null);
+      i += 1;
+    }
+    if (typeof b.birthday === 'string' || b.birthday === null) {
+      sets.push(`birthday = $${i}`);
+      values.push(b.birthday || null);
+      i += 1;
+    }
+    if (sets.length === 0) return res.json({ ok: true });
+    await poolPkg.query(
+      `UPDATE customers SET ${sets.join(', ')} WHERE tenant_id = $1 AND id = $2`,
+      values,
+    );
+    res.json({ ok: true });
+  });
+
+  // ===== Lista de espera (V) =====
+  app.get('/api/bot/waitlist', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const poolPkg = pool.getPool();
+    const r = await poolPkg.query(
+      `SELECT w.*, c.name AS customer_name, c.phone AS customer_phone, s.name AS service_name
+       FROM waitlist w
+       JOIN customers c ON c.id = w.customer_id
+       LEFT JOIN services s ON s.id = w.service_id
+       WHERE w.tenant_id = $1 AND w.status = 'waiting'
+       ORDER BY w.created_at`,
+      [payload.tenant_id],
+    );
+    res.json({ ok: true, waitlist: r.rows });
+  });
+
+  app.post('/api/bot/waitlist', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const b = req.body || {};
+    const phone = normalizePhone(b.phone);
+    if (!phone) return res.status(400).json({ ok: false, error: 'invalid_phone' });
+    const customer = await customers.upsertByPhone(payload.tenant_id, phone, { name: b.name });
+    const poolPkg = pool.getPool();
+    const { rows } = await poolPkg.query(
+      `INSERT INTO waitlist (tenant_id, customer_id, service_id, preferred_date, preferred_time_start, preferred_time_end, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [
+        payload.tenant_id,
+        customer.id,
+        b.service_id || null,
+        b.preferred_date || null,
+        b.preferred_time_start || null,
+        b.preferred_time_end || null,
+        b.notes || null,
+      ],
+    );
+    res.json({ ok: true, entry: rows[0] });
+  });
+
+  app.post('/api/bot/waitlist/:id/notify', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const poolPkg = pool.getPool();
+    const r = await poolPkg.query(
+      `SELECT w.*, c.phone, c.name FROM waitlist w
+       JOIN customers c ON c.id = w.customer_id
+       WHERE w.id = $1 AND w.tenant_id = $2`,
+      [req.params.id, payload.tenant_id],
+    );
+    const entry = r.rows[0];
+    if (!entry) return res.status(404).json({ ok: false, error: 'not_found' });
+    const firstName = (entry.name || '').split(' ')[0] || 'Olá';
+    const text = `Oi ${firstName}! Abriu um horário pra você. Me avisa qual dia/hora fica melhor que eu já reservo 💈`;
+    const jid = phoneToJid(entry.phone);
+    try {
+      await wa.sendText(payload.tenant_id, jid, text);
+      await messageQueries.log({
+        tenantId: payload.tenant_id,
+        waMessageId: null,
+        phone: entry.phone,
+        direction: 'out',
+        body: text,
+      });
+      await poolPkg.query(
+        `UPDATE waitlist SET status = 'notified', notified_at = NOW() WHERE id = $1`,
+        [req.params.id],
+      );
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: 'send_failed', detail: err.message });
+    }
+  });
+
+  app.delete('/api/bot/waitlist/:id', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const poolPkg = pool.getPool();
+    await poolPkg.query(
+      `DELETE FROM waitlist WHERE id = $1 AND tenant_id = $2`,
+      [req.params.id, payload.tenant_id],
+    );
     res.json({ ok: true });
   });
 

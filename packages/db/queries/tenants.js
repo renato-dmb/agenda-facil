@@ -142,11 +142,40 @@ async function setAudienceMode(tenantId, mode) {
   );
 }
 
+async function listAll() {
+  const { rows } = await getPool().query(
+    `SELECT t.*, s.ai_active,
+       (SELECT COUNT(*) FROM appointments a WHERE a.tenant_id = t.id)::int AS appointment_count,
+       (SELECT COUNT(*) FROM customers c WHERE c.tenant_id = t.id)::int AS customer_count
+     FROM tenants t
+     LEFT JOIN tenant_settings s ON s.tenant_id = t.id
+     ORDER BY t.created_at DESC`,
+  );
+  return rows;
+}
+
+async function createNew({ slug, name, profession_type, timezone, owner_phone, whatsapp_number }) {
+  const tenant = await upsertTenant({
+    slug,
+    name,
+    profession_type,
+    timezone,
+    whatsapp_number: whatsapp_number || null,
+    status: 'pending',
+  });
+  if (owner_phone) {
+    await setOwnerPhone(tenant.id, owner_phone);
+  }
+  await upsertSettings(tenant.id, {});
+  return tenant;
+}
+
 module.exports = {
   getBySlug,
   getById,
   getByWhatsAppNumber,
   listActive,
+  listAll,
   listByOwnerPhone,
   upsertTenant,
   upsertSettings,
@@ -155,4 +184,5 @@ module.exports = {
   setAiActive,
   setAudienceMode,
   setStatus,
+  createNew,
 };

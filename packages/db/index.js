@@ -10,4 +10,5 @@ module.exports = {
   services: require('./queries/services'),
   contacts: require('./queries/contacts'),
   authCodes: require('./queries/auth-codes'),
+  knowledge: require('./queries/knowledge'),
 };

@@ -1,5 +1,51 @@
 const { getPool } = require('../pool');
 
+async function listAll(tenantId) {
+  const { rows } = await getPool().query(
+    `SELECT * FROM services WHERE tenant_id = $1 ORDER BY display_order, name`,
+    [tenantId],
+  );
+  return rows;
+}
+
+async function createForTenant(tenantId, { name, duration_minutes, price_cents, display_order, active }) {
+  const { rows } = await getPool().query(
+    `INSERT INTO services (tenant_id, name, duration_minutes, price_cents, display_order, active)
+     VALUES ($1, $2, $3, $4, COALESCE($5, 0), COALESCE($6, true))
+     RETURNING *`,
+    [tenantId, name, duration_minutes, price_cents || null, display_order, active],
+  );
+  return rows[0];
+}
+
+async function updateForTenant(tenantId, id, patch) {
+  const sets = [];
+  const values = [tenantId, id];
+  let i = 3;
+  const allowed = ['name', 'duration_minutes', 'price_cents', 'display_order', 'active'];
+  for (const key of allowed) {
+    if (patch[key] !== undefined) {
+      sets.push(`${key} = $${i}`);
+      values.push(patch[key]);
+      i += 1;
+    }
+  }
+  if (sets.length === 0) return null;
+  const { rows } = await getPool().query(
+    `UPDATE services SET ${sets.join(', ')} WHERE tenant_id = $1 AND id = $2 RETURNING *`,
+    values,
+  );
+  return rows[0] || null;
+}
+
+async function deleteForTenant(tenantId, id) {
+  const { rowCount } = await getPool().query(
+    `DELETE FROM services WHERE tenant_id = $1 AND id = $2`,
+    [tenantId, id],
+  );
+  return rowCount;
+}
+
 async function listActive(tenantId) {
   const { rows } = await getPool().query(
     `SELECT * FROM services WHERE tenant_id = $1 AND active = true ORDER BY display_order, name`,
@@ -68,4 +114,14 @@ async function listBusinessHours(tenantId) {
   return rows;
 }
 
-module.exports = { listActive, getById, upsertByName, replaceBusinessHours, listBusinessHours };
+module.exports = {
+  listActive,
+  listAll,
+  getById,
+  upsertByName,
+  createForTenant,
+  updateForTenant,
+  deleteForTenant,
+  replaceBusinessHours,
+  listBusinessHours,
+};

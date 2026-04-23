@@ -1,4 +1,4 @@
-const gcal = require('../../integrations/google-calendar/events');
+const gcal = require('../../integrations/calendar');
 const { appointments } = require('@agenda-facil/db');
 const { addMinutesIso, humanDateTimeInTz } = require('../../utils/dates');
 const { syncForAppointment } = require('../../scheduler/appointment-reminders');

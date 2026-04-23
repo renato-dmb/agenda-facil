@@ -1,4 +1,4 @@
-const gcal = require('../../integrations/google-calendar/events');
+const gcal = require('../../integrations/calendar');
 const { services } = require('@agenda-facil/db');
 const {
   zonedStartOfDayIso,

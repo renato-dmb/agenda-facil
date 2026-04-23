@@ -16,7 +16,7 @@ const { verifyToken } = require('../auth/magic-code');
 const resolver = require('../tenancy/resolver');
 const { normalizePhone, brMobileVariants, phoneToJid } = require('../utils/phone');
 const { addMinutesIso, humanDateTimeInTz } = require('../utils/dates');
-const gcal = require('../integrations/google-calendar/events');
+const gcal = require('../integrations/calendar');
 const { invalidate: invalidateKnowledgeCache } = require('../knowledge/loader');
 const wa = require('../whatsapp/baileys-manager');
 const reminderEngine = require('../scheduler/appointment-reminders');
@@ -292,6 +292,53 @@ function register(app) {
     await knowledge.upsertSection(payload.tenant_id, section, content);
     const tenant = await tenants.getById(payload.tenant_id);
     if (tenant) invalidateKnowledgeCache(tenant.slug);
+    res.json({ ok: true });
+  });
+
+  // ===== Calendar provider (Google | Avec) =====
+  app.get('/api/bot/calendar-provider', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const { externalCreds } = require('@agenda-facil/db');
+    const t = await tenants.getById(payload.tenant_id);
+    const avec = await externalCreds.get(payload.tenant_id, 'avec');
+    res.json({
+      ok: true,
+      provider: t?.calendar_provider || 'google',
+      avec_configured: !!(avec?.token && avec?.base_url),
+    });
+  });
+
+  app.post('/api/bot/calendar-provider', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const provider = req.body?.provider;
+    if (!['google', 'avec'].includes(provider)) {
+      return res.status(400).json({ ok: false, error: 'invalid_provider' });
+    }
+    const poolPkg = pool.getPool();
+    await poolPkg.query(
+      `UPDATE tenants SET calendar_provider = $1, updated_at = NOW() WHERE id = $2`,
+      [provider, payload.tenant_id],
+    );
+    await resolver.refreshTenant(payload.tenant_id);
+    res.json({ ok: true, provider });
+  });
+
+  app.put('/api/bot/avec-credentials', async (req, res) => {
+    const payload = await auth(req, res);
+    if (!payload) return;
+    const b = req.body || {};
+    if (!b.token || !b.base_url) {
+      return res.status(400).json({ ok: false, error: 'missing_fields' });
+    }
+    const { externalCreds } = require('@agenda-facil/db');
+    await externalCreds.upsert(payload.tenant_id, 'avec', {
+      token: String(b.token).trim(),
+      base_url: String(b.base_url).trim().replace(/\/$/, ''),
+      store_id: b.store_id || null,
+      staff_id: b.staff_id || null,
+    });
     res.json({ ok: true });
   });
 

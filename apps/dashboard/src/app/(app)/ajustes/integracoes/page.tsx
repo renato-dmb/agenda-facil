@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { readSession } from '@/lib/auth';
-import { tenants, googleOAuth } from '@agenda-facil/db';
+import { tenants, googleOAuth, externalCreds } from '@agenda-facil/db';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IntegrationsClient } from './integrations-client';
+import { CalendarProviderClient } from './calendar-provider';
 
 const BOT_PUBLIC_URL = process.env.NEXT_PUBLIC_BOT_URL || process.env.BOT_PUBLIC_URL;
 
@@ -15,10 +16,12 @@ export default async function IntegracoesPage() {
   if (!tenant) redirect('/login');
 
   const gcalToken = await googleOAuth.getByTenantId(tenant.id);
+  const avecCreds = await externalCreds.get(tenant.id, 'avec');
   const pairUrl = BOT_PUBLIC_URL
     ? `${BOT_PUBLIC_URL}/pair/${tenant.slug}`
     : `/pair/${tenant.slug}`;
   const pairResetUrl = `${pairUrl}?reset=1`;
+  const currentProvider = (tenant.calendar_provider as 'google' | 'avec') || 'google';
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -33,6 +36,22 @@ export default async function IntegracoesPage() {
       </div>
 
       <IntegrationsClient initialAiActive={tenant.ai_active !== false} />
+
+      <CalendarProviderClient
+        initialProvider={currentProvider}
+        hasGoogle={!!gcalToken}
+        hasAvec={!!(avecCreds?.token && avecCreds?.base_url)}
+        avecConfig={
+          avecCreds
+            ? {
+                token: avecCreds.token || '',
+                base_url: avecCreds.base_url || '',
+                store_id: avecCreds.store_id || '',
+                staff_id: avecCreds.staff_id || '',
+              }
+            : { token: '', base_url: '', store_id: '', staff_id: '' }
+        }
+      />
 
       <Card>
         <CardHeader>

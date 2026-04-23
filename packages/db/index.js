@@ -1,5 +1,6 @@
 module.exports = {
   pool: require('./pool'),
+  testHelpers: require('./test-helpers'),
   tenants: require('./queries/tenants'),
   googleOAuth: require('./queries/google-oauth'),
   customers: require('./queries/customers'),

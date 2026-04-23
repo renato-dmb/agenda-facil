@@ -21,3 +21,10 @@ pnpm-debug.log*
 
 # OS
 .DS_Store
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+.vitest-cache/
+

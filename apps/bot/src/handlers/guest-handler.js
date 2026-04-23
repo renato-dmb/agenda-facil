@@ -174,4 +174,4 @@ async function handle({ tenantId, tenant, phone, text, messageId, msg, chatJid }
   return { mode: 'replied', reply: replyText };
 }
 
-module.exports = { handle };
+module.exports = { handle, safeTrim, checkRateLimit, _rateLimitBuckets: rateLimitBuckets };

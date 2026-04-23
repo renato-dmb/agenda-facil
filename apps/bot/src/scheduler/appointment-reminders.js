@@ -1,4 +1,4 @@
-const { scheduled, appointments, customers, tenants } = require('@agenda-facil/db');
+const { scheduled } = require('@agenda-facil/db');
 
 // Para um appointment recém-criado/reagendado, enfileira ou atualiza as
 // entradas de lembretes (pre_appointment + post_appointment) ativas do tenant.
@@ -15,8 +15,6 @@ async function syncForAppointment(appointmentId) {
     return { ok: true, reason: 'cancelled_cleanup' };
   }
 
-  const customer = await customers.getByPhone(appt.tenant_id, null);
-  // Buscar customer por id ao invés de phone — usamos tabela direta
   const { rows: custRows } = await poolPkg.query(
     `SELECT id, phone FROM customers WHERE id = $1`,
     [appt.customer_id],

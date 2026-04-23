@@ -51,9 +51,24 @@ describe('tools/check-availability', () => {
 
   it('gera slots de 30min alinhados às janelas de funcionamento', async () => {
     const r = await checkAvailability.execute({ date: '2026-04-22' }, { tenant });
-    expect(r.available_slots.length).toBeGreaterThan(0);
-    expect(r.available_slots.length).toBeLessThanOrEqual(20);
+    // 09:00-12:00 (6 slots de 30min) + 14:00-18:00 (8 slots) = 14 slots totais.
+    // available_slots é capped em 20, então deve ser exatamente 14.
+    expect(r.available_slots.length).toBe(14);
     expect(r.duration_minutes).toBe(30);
+
+    // Primeiro slot é 09:00 BRT = 12:00 UTC
+    expect(r.available_slots[0].start).toBe('2026-04-22T12:00:00.000Z');
+    expect(r.available_slots[0].end).toBe('2026-04-22T12:30:00.000Z');
+
+    // Não deve haver slot em 12:00-14:00 BRT (janela fechada pra almoço)
+    const starts = r.available_slots.map((s) => s.start);
+    expect(starts).not.toContain('2026-04-22T15:00:00.000Z'); // 12:00 BRT
+    expect(starts).not.toContain('2026-04-22T16:30:00.000Z'); // 13:30 BRT
+
+    // Último slot começa em 17:30 BRT = 20:30 UTC
+    expect(r.available_slots[r.available_slots.length - 1].start).toBe(
+      '2026-04-22T20:30:00.000Z',
+    );
   });
 
   it('remove slots que colidem com eventos busy', async () => {

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "saudacao",
+    "userMessage": "Oi",
+    "expected": "Oi! 👋 Bem-vindo à **Barbearia Teste**! Sou a assistente virtual por aqui. Posso te ajudar a marcar horário, tirar dúvidas sobre serviços/políticas, ou consultar um agendamento existente. Como posso te ajudar hoje?"
+  },
+  {
+    "id": "politica-cancelamento",
+    "userMessage": "Qual a política de cancelamento?",
+    "expected": "O cancelamento é sem custo se for avisado com pelo menos 2 horas de antecedência. Atrasos acima de 15 minutos precisam remarcar."
+  },
+  {
+    "id": "preco-corte",
+    "userMessage": "Quanto custa o corte clássico?",
+    "expected": "O corte clássico custa R$ 45 e leva 30 minutos. Quer marcar?"
+  }
+]

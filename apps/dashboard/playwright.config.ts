@@ -3,6 +3,12 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = Number(process.env.DASHBOARD_TEST_PORT || 3102);
 const BASE_URL = process.env.DASHBOARD_BASE_URL || `http://localhost:${PORT}`;
 
+// Env vars disponíveis pros testes (não só pro webServer)
+process.env.TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL || 'postgres://test:test@localhost:5433/agenda_facil_test';
+process.env.DATABASE_URL = process.env.DATABASE_URL || process.env.TEST_DATABASE_URL;
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-32-chars-minimum-ok';
+
 export default defineConfig({
   testDir: './test/e2e',
   timeout: 60_000,

@@ -10,7 +10,10 @@
       "Bash(curl -fsS *)",
       "Bash(curl -I *)",
       "Bash(curl -sI *)",
-      "Bash(node --check *)"
+      "Bash(node --check *)",
+      "Bash(docker compose -f docker-compose.test.yml *)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm exec playwright *)"
     ]
   }
 }

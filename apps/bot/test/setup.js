@@ -1,11 +1,15 @@
 // Global test setup — roda antes de cada arquivo de teste.
-// Define env vars mínimos pro código funcionar sem .env.
+// Carrega .env do bot pra E2E ter acesso à ANTHROPIC_API_KEY real.
+try {
+  require('dotenv').config({ path: require('node:path').join(__dirname, '..', '.env') });
+} catch {
+  // ignore — sem .env, usa defaults abaixo
+}
 process.env.NODE_ENV = 'test';
 process.env.DEFAULT_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Sao_Paulo';
+// Em teste, DATABASE_URL aponta sempre pro banco de teste (override do .env).
 process.env.DATABASE_URL =
-  process.env.DATABASE_URL ||
-  process.env.TEST_DATABASE_URL ||
-  'postgres://test:test@localhost:5433/agenda_facil_test';
+  process.env.TEST_DATABASE_URL || 'postgres://test:test@localhost:5433/agenda_facil_test';
 
 // Chaves dummy pra código que inicializa clientes no require.
 process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || 'sk-ant-test';

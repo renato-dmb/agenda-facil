@@ -1,340 +1,100 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Áreas de Atuação & Impacto — Starbem</title>
-<style>
-  :root{
-    --bg:#0B1020; --bg2:#121A2E;
-    --ink:#EaF0Fb; --muted:#9AA7BD;
-    --accent:#2DD4BF; --accent2:#F4B740; --line:rgba(255,255,255,.08);
-    --card:rgba(255,255,255,.04);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1200px 700px at 80% -10%,#1b2742 0%,var(--bg) 55%) fixed;
-    color:var(--ink); overflow:hidden;
-  }
-  .deck{height:100vh;width:100vw;position:relative}
-  .slide{
-    position:absolute;inset:0;display:none;flex-direction:column;
-    justify-content:center;padding:6vh 9vw;animation:fade .4s ease;
-  }
-  .slide.active{display:flex}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .kicker{
-    display:inline-block;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--accent);font-weight:700;margin-bottom:.9rem;
-  }
-  h1{font-size:3.6rem;line-height:1.05;font-weight:800;letter-spacing:-.02em}
-  h2{font-size:2.5rem;line-height:1.1;font-weight:800;letter-spacing:-.01em;margin-bottom:1.4rem}
-  h2 .num{color:var(--accent);font-variant-numeric:tabular-nums}
-  .sub{color:var(--muted);font-size:1.25rem;margin-top:1.2rem;max-width:60ch;line-height:1.5}
-  ul{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-top:.4rem}
-  li{position:relative;padding-left:1.7rem;font-size:1.18rem;line-height:1.45;max-width:70ch}
-  li::before{content:"";position:absolute;left:0;top:.55em;width:.55rem;height:.55rem;
-    border-radius:2px;background:var(--accent);transform:rotate(45deg)}
-  li b{color:#fff}
-  .cols{display:grid;grid-template-columns:1fr 1fr;gap:2.2rem 3rem;margin-top:.4rem}
-  .group h3{font-size:1.05rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
-  .group ul{gap:.45rem}
-  .group li{font-size:1.05rem;padding-left:1.4rem}
-  .group li::before{width:.45rem;height:.45rem;top:.5em}
-  .chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.6rem}
-  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;
-    padding:.5rem 1rem;font-size:.95rem;color:var(--ink)}
-  .chip b{color:var(--accent)}
-  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem}
-  .metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.5rem 1.4rem}
-  .metric .big{font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.02em}
-  .metric .lbl{color:var(--muted);font-size:1rem;margin-top:.6rem;line-height:1.35}
-  .grid-areas{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.8rem}
-  .area-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.2rem}
-  .area-card .t{font-weight:700;font-size:1.15rem}
-  .area-card .d{color:var(--muted);font-size:.95rem;margin-top:.35rem;line-height:1.4}
-  .area-card .v{color:var(--accent2);font-size:.85rem;margin-top:.7rem;font-weight:600}
-  .cover-brand{font-size:1.05rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  .cover h1{margin:1.2rem 0 .4rem;font-size:4.2rem}
-  .cover .who{color:var(--muted);font-size:1.3rem;margin-top:1.6rem}
-  .footer{position:absolute;left:9vw;right:9vw;bottom:3.5vh;display:flex;justify-content:space-between;
-    color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:1rem}
-  .progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);width:0;transition:width .3s;z-index:50}
-  .nav{position:fixed;right:18px;bottom:14px;display:flex;gap:8px;z-index:50}
-  .nav button{background:var(--card);border:1px solid var(--line);color:var(--ink);
-    width:38px;height:38px;border-radius:10px;font-size:1.1rem;cursor:pointer}
-  .nav button:hover{border-color:var(--accent)}
-  .hint{position:fixed;left:18px;bottom:16px;color:var(--muted);font-size:.78rem;z-index:50}
-  .lead{color:var(--accent2);font-weight:700}
-
-  @media print{
-    @page{size:1280px 720px;margin:0}
-    html,body{height:auto;overflow:visible;background:var(--bg)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .deck{height:auto}
-    .slide{display:flex!important;position:relative;inset:auto;height:720px;width:1280px;page-break-after:always;animation:none}
-    .nav,.hint,.progress{display:none!important}
-  }
-</style>
-</head>
-<body>
-<div class="progress" id="bar"></div>
-<div class="deck" id="deck">
-
-  <!-- 1. CAPA -->
-  <section class="slide active cover">
-    <div class="cover-brand">★ Starbem</div>
-    <h1>Áreas de Atuação<br>& Impacto</h1>
-    <div class="sub">Uma visão consolidada das frentes que conduzo hoje na companhia —
-      do produto à infraestrutura, passando por dados, CS, suporte e times.</div>
-    <div class="who">Renato · Tecnologia, Produto, Dados & CS · Junho/2026</div>
-  </section>
-
-  <!-- 2. VISÃO GERAL DAS ÁREAS -->
-  <section class="slide">
-    <span class="kicker">Onde eu atuo hoje</span>
-    <h2>Seis frentes, uma operação</h2>
-    <div class="sub">Cada frente abaixo equivale, no mercado, a um cargo de diretoria ou
-      liderança. Hoje todas convergem numa atuação integrada — com um líder em desenvolvimento
-      por trás de cada uma.</div>
-    <div class="grid-areas">
-      <div class="area-card"><div class="t">Customer Success</div><div class="d">Estrutura, operação de implantação e ciclo de vida do cliente.</div></div>
-      <div class="area-card"><div class="t">Produto</div><div class="d">B2C, profissional, RH (NR1) e parcerias — 5 OKRs.</div></div>
-      <div class="area-card"><div class="t">Engenharia</div><div class="d">Plataforma, segurança, IA e novos modelos de operação.</div></div>
-      <div class="area-card"><div class="t">Dados</div><div class="d">Datalake e inteligência preditiva/prescritiva.</div></div>
-      <div class="area-card"><div class="t">IT & Suporte</div><div class="d">Tickets, integração com CS/Produto e custos.</div></div>
-      <div class="area-card"><div class="t">Principal Engineer</div><div class="d">Arquitetura, nuvem e fornecedores estratégicos.</div></div>
-    </div>
-  </section>
-
-  <!-- 3. CS -->
-  <section class="slide">
-    <span class="kicker">Área 1 · Customer Success</span>
-    <h2>Estruturei o CS de ponta a ponta</h2>
-    <div class="cols">
-      <div class="group">
-        <h3>Operação</h3>
-        <ul>
-          <li>Estruturação da área e do modelo de <b>CSM</b></li>
-          <li>Novo modelo de operação de <b>implantação</b></li>
-          <li>Processo fim a fim: <b>Vendas → Implantação → Manutenção → Expansão</b></li>
-          <li>Implementação de automação e troca da liderança de CX</li>
-        </ul>
-      </div>
-      <div class="group">
-        <h3>Liderança</h3>
-        <ul>
-          <li>Plano de transformação da área</li>
-          <li>Desenvolvimento do líder para voar solo</li>
-          <li>Apoio nos processos seletivos e na escolha de pessoas</li>
-          <li>Atuação direta na troca de pessoas-chave</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. PRODUTO -->
-  <section class="slide">
-    <span class="kicker">Área 2 · Produto · 5 OKRs</span>
-    <h2>Produto em quatro frentes simultâneas</h2>
-    <div class="cols">
-      <div class="group">
-        <h3>Paciente (B2C)</h3>
-        <ul>
-          <li>Cross Service, canal <b>WhatsApp</b>, <b>StarBrain</b> (visão unificada)</li>
-          <li>Jornada <b>Shapeme</b> e evolução do B2C + faturamento</li>
-        </ul>
-        <h3 style="margin-top:1.1rem">Profissional</h3>
-        <ul>
-          <li>Videochamadas, NPS, <b>prontuário automatizado</b></li>
-          <li>Automação de cadastro, consumo, NF · agendas e faturamento TP</li>
-        </ul>
-      </div>
-      <div class="group">
-        <h3>RH (NR1)</h3>
-        <ul>
-          <li><b>NR1</b> e Portal RH · multi-tiers (Produto 1–4)</li>
-          <li>Reuniões comerciais com clientes</li>
-        </ul>
-        <h3 style="margin-top:1.1rem">Parcerias</h3>
-        <ul>
-          <li>API V2, <b>iFood</b>, TotalPass, Claro · custos de LLM</li>
-          <li>Novos produtos para parceiros (Shapeme)</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. ENGENHARIA -->
-  <section class="slide">
-    <span class="kicker">Área 3 · Engenharia</span>
-    <h2>Plataforma, segurança e IA</h2>
-    <div class="cols">
-      <div class="group">
-        <h3>Construção</h3>
-        <ul>
-          <li>Acompanhamento semanal da <b>qualidade de chamada</b></li>
-          <li>Segurança com a <b>Tempest</b> + próximos passos</li>
-          <li>Construção do produto <b>Shapeme</b></li>
-          <li>Plataforma <b>Tiny Teams</b> e novo modelo de operação</li>
-          <li>Camada agêntica <b>ExABI</b></li>
-        </ul>
-      </div>
-      <div class="group">
-        <h3>Liderança</h3>
-        <ul>
-          <li>Desenvolvimento da líder para atuação estratégica no negócio</li>
-          <li>Troca de pessoas-chave</li>
-          <li>Novos modelos de operação de engenharia</li>
-          <li>Engenharia <b>cross-área</b> (ex.: CS AI Engineering)</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. DADOS -->
-  <section class="slide">
-    <span class="kicker">Área 4 · Dados</span>
-    <h2>Da arquitetura à inteligência preditiva</h2>
-    <div class="cols">
-      <div class="group">
-        <h3>Construção</h3>
-        <ul>
-          <li>Estruturação do <b>Datalake</b> e da camada inteligente</li>
-          <li>Análises <b>preditivas e prescritivas</b></li>
-          <li>Reestruturação da arquitetura de dados</li>
-          <li>Camada de inteligência do negócio · contratações</li>
-        </ul>
-      </div>
-      <div class="group">
-        <h3>Liderança</h3>
-        <ul>
-          <li>PDI e desenvolvimento do time</li>
-          <li>People management e engajamento (Rodrigo)</li>
-          <li>Plano de crescimento: novo líder + analista de <b>impacto financeiro</b></li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. IT & SUPORTE + PRINCIPAL ENG -->
-  <section class="slide">
-    <span class="kicker">Áreas 5 e 6 · IT & Suporte · Principal Engineer</span>
-    <h2>A base que sustenta tudo</h2>
-    <div class="cols">
-      <div class="group">
-        <h3>IT & Suporte</h3>
-        <ul>
-          <li>Estrutura de <b>tickets</b> e acompanhamento contínuo</li>
-          <li>Integração <b>Suporte ↔ CS ↔ Produto</b></li>
-          <li>Redução de custo no contrato de aluguel de PCs</li>
-        </ul>
-      </div>
-      <div class="group">
-        <h3>Principal Engineer</h3>
-        <ul>
-          <li>Análise semanal de <b>bugs estruturais</b> (com Júlio)</li>
-          <li>Desenho arquitetural das soluções</li>
-          <li>Nuvem: <b>troca AWS</b> e custo de infra ~0</li>
-          <li>Fornecedores: <b>Agora.io</b> e <b>Twilio</b> (renegociação)</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8. TIMES -->
-  <section class="slide">
-    <span class="kicker">O que conecta todas as áreas</span>
-    <h2>Construí os times que sustentam a operação</h2>
-    <div class="sub"><span class="lead">15+ pessoas</span> contratadas e formadas em Tecnologia,
-      Produto, Dados e Suporte. Por trás de cada área, um líder que estou desenvolvendo.</div>
-    <div class="chips">
-      <span class="chip"><b>Barbara</b></span>
-      <span class="chip"><b>Felipe</b></span>
-      <span class="chip"><b>Tenório</b></span>
-      <span class="chip"><b>Leo</b></span>
-      <span class="chip"><b>Rodrigo</b></span>
-      <span class="chip"><b>Bruno</b></span>
-      <span class="chip"><b>Vitor</b></span>
-      <span class="chip"><b>Humberto</b></span>
-      <span class="chip"><b>Mila</b></span>
-    </div>
-    <div class="sub" style="margin-top:1.6rem">Resultado: um salto na <b>qualidade percebida</b>
-      do time — consistência e confiabilidade que hoje são referência interna.</div>
-  </section>
-
-  <!-- 9. CONQUISTAS MACRO -->
-  <section class="slide">
-    <span class="kicker">Destaques do período</span>
-    <h2>Três entregas que mudaram o patamar</h2>
-    <div class="metrics">
-      <div class="metric"><div class="big">R$30k→100k</div><div class="lbl">MRR do novo produto <b>100% IA</b>, puxado por iFood e TotalPass México</div></div>
-      <div class="metric"><div class="big">15+</div><div class="lbl">pessoas contratadas e formadas, com líderes em desenvolvimento</div></div>
-      <div class="metric"><div class="big">~R$800k</div><div class="lbl">de custo de nuvem evitado até dez/2026 (Azure → AWS + créditos)</div></div>
-    </div>
-    <div class="sub" style="margin-top:1.8rem">Além de receita habilitada em parcerias, risco
-      mitigado em segurança e a base de dados pronta para decisões preditivas.</div>
-  </section>
-
-  <!-- 10. PRODUTO IA / FUTURO -->
-  <section class="slide">
-    <span class="kicker">Para onde vai</span>
-    <h2>Estratégia de produto com IA — próximos 12 meses</h2>
-    <ul>
-      <li><b>Produto 100% IA</b> em escala: de R$30k para <b>+R$100k de MRR</b>, com pipeline
-        de parceiros querendo aderir (iFood, TotalPass México).</li>
-      <li><b>ExABI</b> — camada agêntica da Starbem como diferencial competitivo.</li>
-      <li><b>StarBrain</b> retroalimentado por dados: visão unificada de paciente e profissional.</li>
-      <li><b>Datalake preditivo</b> ligando dados a impacto financeiro do negócio.</li>
-      <li><b>Tiny Teams</b>: fazer mais com menos, escalando operação com IA.</li>
-    </ul>
-  </section>
-
-  <!-- 11. FECHAMENTO -->
-  <section class="slide">
-    <span class="kicker">Em resumo</span>
-    <h2>Uma visão consolidada — pronta para discutir</h2>
-    <div class="sub">Seis áreas de atuação, 15+ pessoas formadas, um produto de IA em
-      crescimento acelerado e uma operação mais barata e mais confiável. Trouxe esse panorama
-      para darmos visibilidade ao todo e <b>discutirmos juntos os próximos passos de cada frente</b>.</div>
-    <div class="chips" style="margin-top:2rem">
-      <span class="chip">Customer Success</span>
-      <span class="chip">Produto</span>
-      <span class="chip">Engenharia</span>
-      <span class="chip">Dados</span>
-      <span class="chip">IT & Suporte</span>
-      <span class="chip">Arquitetura & Nuvem</span>
-      <span class="chip">Times & Liderança</span>
-    </div>
-  </section>
-
+<html lang="pt-BR"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Áreas de Atuação & Impacto — Starbem</title><style>
+:root{--bg:#0B1020;--ink:#EAF0FB;--muted:#9AA7BD;--accent:#2DD4BF;--accent2:#F4B740;--line:rgba(255,255,255,.08);--card:rgba(255,255,255,.04)}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 700px at 80% -10%,#1b2742 0%,var(--bg) 55%) fixed;color:var(--ink);overflow:hidden}
+.deck{height:100vh;width:100vw;position:relative}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:5.5vh 8vw;animation:fade .4s ease}
+.slide.active{display:flex}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.kicker{display:inline-block;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.8rem}
+h1{font-size:3.6rem;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+h2{font-size:2.3rem;line-height:1.1;font-weight:800;letter-spacing:-.01em;margin-bottom:1.2rem}
+.sub{color:var(--muted);font-size:1.2rem;margin-top:1rem;max-width:64ch;line-height:1.5}
+ul{list-style:none;display:flex;flex-direction:column;gap:.55rem;margin-top:.3rem}
+li{position:relative;padding-left:1.5rem;font-size:1.08rem;line-height:1.4;color:var(--muted)}
+li::before{content:"";position:absolute;left:0;top:.5em;width:.5rem;height:.5rem;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
+li b{color:#fff;font-weight:600}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem 3rem;margin-top:.3rem}
+.group.wide{max-width:100%}
+.group h3{font-size:1rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.4rem}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.45rem 1rem;font-size:.92rem}
+.chip b{color:var(--accent)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:1.8rem}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.3rem}
+.metric .big{font-size:2.3rem;font-weight:800;color:var(--accent);line-height:1}
+.metric .lbl{color:var(--muted);font-size:.98rem;margin-top:.6rem;line-height:1.35}
+.grid-areas{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:1.6rem}
+.area-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.1rem}
+.area-card .t{font-weight:700;font-size:1.1rem}.area-card .d{color:var(--muted);font-size:.92rem;margin-top:.3rem;line-height:1.35}
+.cover-brand{font-size:1rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.cover h1{margin:1rem 0 .3rem;font-size:4rem}.cover .who{color:var(--muted);font-size:1.25rem;margin-top:1.5rem}.lead{color:var(--accent2);font-weight:700}
+.progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);width:0;transition:width .3s;z-index:50}
+.nav{position:fixed;right:18px;bottom:14px;display:flex;gap:8px;z-index:50}
+.nav button{background:var(--card);border:1px solid var(--line);color:var(--ink);width:38px;height:38px;border-radius:10px;font-size:1.1rem;cursor:pointer}
+.nav button:hover{border-color:var(--accent)}.hint{position:fixed;left:18px;bottom:16px;color:var(--muted);font-size:.76rem;z-index:50}
+@media print{@page{size:1280px 720px;margin:0}html,body{height:auto;overflow:visible;background:var(--bg)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.deck{height:auto}.slide{display:flex!important;position:relative;inset:auto;height:720px;width:1280px;page-break-after:always;animation:none}.nav,.hint,.progress{display:none!important}}
+</style></head><body>
+<div class="progress" id="bar"></div><div class="deck" id="deck">
+<section class="slide active cover">
+<div class="cover-brand">★ Starbem</div>
+<h1>Áreas de Atuação<br>& Impacto</h1>
+<div class="sub">Uma visão consolidada e detalhada de todas as frentes que conduzo hoje na companhia — do produto à infraestrutura, passando por dados, CS, suporte e times.</div>
+<div class="who">Renato · Tecnologia, Produto, Dados &amp; CS · Junho/2026</div></section>
+<section class="slide"><span class="kicker">Onde eu atuo hoje</span>
+<h2>Seis frentes, uma operação</h2>
+<div class="sub">Cada frente equivale, no mercado, a um cargo de diretoria ou liderança — e por trás de cada uma há um líder em desenvolvimento.</div>
+<div class="grid-areas"><div class="area-card"><div class="t">Customer Success</div><div class="d">Estrutura, implantação e ciclo de vida do cliente.</div></div><div class="area-card"><div class="t">Produto · 5 OKRs</div><div class="d">Paciente, Profissional, RH (NR1) e Parcerias.</div></div><div class="area-card"><div class="t">Engenharia</div><div class="d">Plataforma, segurança, IA e novos modelos de operação.</div></div><div class="area-card"><div class="t">Dados</div><div class="d">Datalake e inteligência preditiva/prescritiva.</div></div><div class="area-card"><div class="t">IT & Suporte</div><div class="d">Tickets, integração com CS/Produto e custos.</div></div><div class="area-card"><div class="t">Principal Engineer</div><div class="d">Arquitetura, nuvem e fornecedores estratégicos.</div></div></div></section>
+<section class="slide"><span class="kicker">Área 1 · Customer Success</span>
+<h2>Customer Success</h2><div class="cols"><div class="group"><h3>Diretoria — Operação</h3><ul><li>Estruturação da área</li><li>Estrutura de <b>CSM</b></li><li>Novo modelo de operação de <b>implantação</b></li><li>Troca de liderança de CX</li><li>Implementação de <b>automação</b></li><li>Processo fim a fim: <b>Vendas → Implantação → Manutenção → Expansão</b></li><li>Novo modelo de operação (Thaís)</li></ul></div><div class="group"><h3>Liderança</h3><ul><li>Estruturação de plano de transformação da área</li><li>Desenvolvimento do líder que ainda não está pronto para voar solo</li><li>Apoio em todos os processos seletivos e desenvolvimento do líder para escolher pessoas</li><li>Atuação direta na troca de pessoal-chave do time</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · 5 OKRs</span>
+<h2 style="font-size:3rem">Produto</h2>
+<div class="sub">Quatro frentes de produto + liderança — uma página dedicada para cada:</div>
+<div class="group wide" style="margin-top:1rem"><ul><li>Frente <b>Paciente</b> — jornada B2C</li><li>Frente <b>Profissional</b></li><li>Frente <b>RH</b> (NR1)</li><li>Frente <b>Parcerias</b></li><li><b>Liderança</b> de Produto</li></ul></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · Frente Paciente</span>
+<h2>Paciente — Jornada B2C</h2><div class="cols"><div class="group"><ul><li>Uso de múltiplos serviços — <b>Cross Service</b></li><li>Novo canal <b>WhatsApp</b> para pacientes</li><li><b>StarBrain</b> — Cérebro Central com visão unificada do paciente</li><li><b>Shapeme</b> — Jornada comercial</li></ul></div><div class="group"><ul><li><b>Shapeme</b> — Desenho da jornada</li><li>Evolução de jornada <b>B2C</b></li><li>Acompanhamento de faturamento e crescimento de B2C</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · Frente Profissional</span>
+<h2>Profissional</h2><div class="cols"><div class="group"><ul><li>Correção e acompanhamento de <b>videochamadas</b></li><li>Evolução de <b>NPS</b></li><li>Pesquisa de qualidade de atendimento</li><li>Pesquisa de infraestrutura profissional</li><li>Gravação e transcrição de chamada</li></ul></div><div class="group"><ul><li>Construção de <b>prontuário automatizado</b></li><li>Retroalimentação do cérebro central</li><li>Planejamento de serviços de automação para o profissional: cadastro, consumo mensal, notas fiscais etc.</li><li>Controle de agendas e faturamento <b>TP</b></li><li>Evolução e análise mensal de qualidade e melhorias para profissionais</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · Frente RH</span>
+<h2>RH — NR1 & Portal RH</h2><div class="cols"><div class="group"><ul><li>Construção/evolução de <b>NR1</b></li><li>Construção/evolução do <b>Portal RH</b></li><li>Correção de problemas NR1 (Eduardo O.)</li><li>Planejamento e evolução do Portal RH para valor real ao RH</li></ul></div><div class="group"><ul><li>Definição <b>multi-tiers</b> de NR1 para múltiplas demandas de clientes (Produto de 1 a 4)</li><li>Reuniões comerciais com clientes — retirada de dúvidas sobre NR1</li><li>Evolução de dores em casos de falha de APIs em cliente B2B (<b>iFood</b>)</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · Frente Parcerias</span>
+<h2>Parcerias</h2><div class="cols"><div class="group"><ul><li>Análise de qualidade da <b>API V2</b></li><li>Atuações pontuais em problemas crônicos da API (ex.: iFood)</li><li>Apoio à estrutura do time com pouco headcount</li></ul></div><div class="group"><ul><li>Reuniões comerciais com parceiros como <b>iFood, TotalPass, Claro</b> etc.</li><li>Evolução e acompanhamento de custos mensais de <b>LLM</b></li><li>Construção e evolução de novos produtos para parceiros, como <b>Shapeme</b></li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 2 · Produto · Liderança</span>
+<h2>Liderança de Produto</h2><div class="group wide"><h3>Liderança</h3><ul><li>Estruturação de plano de evolução da área, com foco na dificuldade de escala</li><li>Desenvolvimento do líder que ainda não está pronto para voar solo</li><li>Apoio em todos os processos seletivos e desenvolvimento do líder para escolher pessoas</li><li>Atuação direta na troca de pessoas-chave do time</li></ul></div></section>
+<section class="slide"><span class="kicker">Área 3 · Engenharia</span>
+<h2>Engenharia</h2><div class="cols"><div class="group"><h3>Diretoria</h3><ul><li>Evolução e acompanhamento semanal de qualidade de chamada</li><li>Consultoria de Segurança — <b>Tempest</b></li><li>Próximos passos de estruturação de Segurança</li><li><b>Shapeme</b> — construção do produto</li><li>Visão de projeto <b>Tiny Teams</b></li><li>Construção da plataforma Tiny Teams e novo modelo de operação</li><li>Camada Agêntica Starbem — <b>ExABI</b></li></ul></div><div class="group"><h3>Liderança</h3><ul><li>Desenvolvimento da líder para atuação estratégica no business</li><li>Atuação direta na troca de pessoas-chave do time</li><li>Desenvolvimento e expansão de consciência para novos modelos de operação de engenharia</li><li>Aumento de escopo para ampliação de impacto, implantando engenharia cross-área (ex.: CS AI Engineering)</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 4 · Dados</span>
+<h2>Dados</h2><div class="cols"><div class="group"><h3>Diretoria</h3><ul><li>Estruturação e construção do <b>Datalake</b> e da camada inteligente da Starbem para análises prescritivas e preditivas</li><li>Construção e manutenção da camada de inteligência do negócio</li><li>Reestruturação da arquitetura de dados da Starbem</li><li>Atuação na contratação de novos profissionais</li></ul></div><div class="group"><h3>Liderança</h3><ul><li>Atuação com <b>PDI</b> e desenvolvimento do time</li><li>Acompanhamento semanal de tarefas</li><li>People management para engajamento do Rodrigo</li><li>Plano de crescimento da área com novo líder e segundo analista focado em análise preditiva e impacto financeiro</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Área 5 · IT & Suporte</span>
+<h2>IT & Suporte</h2><div class="group wide"><h3>IT & Suporte</h3><ul><li>Construção e manutenção da estrutura de <b>tickets</b> e suporte</li><li>Acompanhamento de evolução de tickets</li><li>Aproximação entre <b>Suporte, CS e Produto</b> para evolução contínua</li><li>Relacionamento e definição de estratégia para redução de custos no contrato de provedor de aluguel de PCs</li><li>Definição da operação da área</li></ul></div></section>
+<section class="slide"><span class="kicker">Área 6 · Principal Engineer</span>
+<h2>Principal Engineer</h2><div class="cols"><div class="group"><ul><li>Análises semanais de bugs estruturais da operação (com Júlio)</li><li>Desenho arquitetural de soluções da Starbem</li><li>Relacionamento com provedor de nuvem</li><li>Troca de parceiro <b>AWS</b></li></ul></div><div class="group"><ul><li>Acompanhamento mensal de custos de nuvem</li><li>Manutenção de <b>custo zero</b> de infraestrutura Starbem</li><li>Relacionamento estratégico com fornecedores como <b>Agora.io</b> e <b>Twilio</b></li><li>Discussão de contrato para redução de custos com Agora e Twilio</li></ul></div></div></section>
+<section class="slide"><span class="kicker">Camada transversal</span>
+<h2>Estratégia Starbem</h2><div class="group wide"><h3>Estratégia</h3><ul><li>Apoio na estruturação de <b>OKRs</b></li><li>Influência em múltiplas áreas e com múltiplos líderes para aumento de impacto</li><li>Evolução nos processos de contratação para aumento de talentos no quadro de colaboradores</li><li>Discussões estratégicas sobre o futuro dos produtos e construção de vantagem competitiva</li></ul></div></section>
+<section class="slide"><span class="kicker">O que conecta todas as áreas</span>
+<h2>Construí os times que sustentam a operação</h2>
+<div class="sub"><span class="lead">15+ pessoas</span> contratadas e formadas em Tecnologia, Produto, Dados e Suporte. Por trás de cada área, um líder que estou desenvolvendo.</div>
+<div class="chips"><span class="chip"><b>Barbara</b></span><span class="chip"><b>Felipe</b></span><span class="chip"><b>Tenório</b></span><span class="chip"><b>Leo</b></span><span class="chip"><b>Rodrigo</b></span><span class="chip"><b>Bruno</b></span><span class="chip"><b>Vitor</b></span><span class="chip"><b>Humberto</b></span><span class="chip"><b>Mila</b></span></div>
+<div class="sub" style="margin-top:1.4rem">Resultado: um salto na <b>qualidade percebida</b> do time — consistência e confiabilidade que hoje são referência interna.</div></section>
+<section class="slide"><span class="kicker">Destaques do período</span>
+<h2>Três entregas que mudaram o patamar</h2><div class="metrics"><div class="metric"><div class="big">R$30k→100k</div><div class="lbl">MRR do novo produto <b>100% IA</b>, puxado por iFood e TotalPass México</div></div><div class="metric"><div class="big">15+</div><div class="lbl">pessoas contratadas e formadas, com líderes em desenvolvimento</div></div><div class="metric"><div class="big">~R$800k</div><div class="lbl">de custo de nuvem evitado até dez/2026 (Azure → AWS + créditos)</div></div></div>
+<div class="sub" style="margin-top:1.6rem">Além de receita habilitada em parcerias, risco mitigado em segurança e a base de dados pronta para decisões preditivas.</div></section>
+<section class="slide"><span class="kicker">Para onde vai</span>
+<h2>Estratégia de produto com IA — próximos 12 meses</h2><div class="group wide"><ul><li><b>Produto 100% IA</b> em escala: de R$30k para <b>+R$100k de MRR</b>, com pipeline de parceiros (iFood, TotalPass México)</li><li><b>ExABI</b> — camada agêntica da Starbem como diferencial competitivo</li><li><b>StarBrain</b> retroalimentado por dados: visão unificada de paciente e profissional</li><li><b>Datalake preditivo</b> ligando dados a impacto financeiro do negócio</li><li><b>Tiny Teams</b>: fazer mais com menos, escalando operação com IA</li></ul></div></section>
+<section class="slide"><span class="kicker">Em resumo</span>
+<h2>Uma visão consolidada — pronta para discutir</h2>
+<div class="sub">Seis áreas de atuação detalhadas, 15+ pessoas formadas, um produto de IA em crescimento acelerado e uma operação mais barata e mais confiável. Trouxe esse panorama para darmos visibilidade ao todo e <b>discutirmos juntos os próximos passos de cada frente</b>.</div>
+<div class="chips" style="margin-top:1.8rem"><span class="chip">Customer Success</span><span class="chip">Produto</span><span class="chip">Engenharia</span><span class="chip">Dados</span><span class="chip">IT & Suporte</span><span class="chip">Arquitetura & Nuvem</span><span class="chip">Times & Liderança</span></div></section>
 </div>
-
-<div class="nav">
-  <button onclick="go(-1)" aria-label="Anterior">‹</button>
-  <button onclick="go(1)" aria-label="Próximo">›</button>
-</div>
+<div class="nav"><button onclick="go(-1)">‹</button><button onclick="go(1)">›</button></div>
 <div class="hint">← → para navegar · F para tela cheia · Ctrl/Cmd+P para exportar PDF</div>
-
 <script>
-  const slides=[...document.querySelectorAll('.slide')];
-  let i=0;
-  function show(n){
-    i=Math.max(0,Math.min(slides.length-1,n));
-    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
-    document.getElementById('bar').style.width=((i)/(slides.length-1)*100)+'%';
-  }
-  function go(d){show(i+d)}
-  document.addEventListener('keydown',e=>{
-    if(['ArrowRight','PageDown',' '].includes(e.key)){go(1);e.preventDefault()}
-    if(['ArrowLeft','PageUp'].includes(e.key)){go(-1);e.preventDefault()}
-    if(e.key==='Home')show(0);
-    if(e.key==='End')show(slides.length-1);
-    if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}
-  });
-  document.getElementById('deck').addEventListener('click',e=>{if(!e.target.closest('.nav'))go(1)});
-  show(0);
-</script>
-</body>
-</html>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===i));document.getElementById('bar').style.width=(i/(slides.length-1)*100)+'%'}
+function go(d){show(i+d)}
+document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){go(1);e.preventDefault()}if(['ArrowLeft','PageUp'].includes(e.key)){go(-1);e.preventDefault()}if(e.key==='Home')show(0);if(e.key==='End')show(slides.length-1);if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}});
+document.getElementById('deck').addEventListener('click',e=>{if(!e.target.closest('.nav'))go(1)});show(0);
+</script></body></html>

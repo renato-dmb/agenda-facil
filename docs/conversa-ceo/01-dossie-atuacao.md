@@ -188,4 +188,4 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
 1. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
 2. `[seu maior resultado concreto — com número]`
-3. `[sua maior economia gerada — ver doc 3]`
+3. **~US$ 100k–150k** (R$ 540k–810k) de custo de nuvem evitado (Azure→AWS+créditos) — ver doc 3.

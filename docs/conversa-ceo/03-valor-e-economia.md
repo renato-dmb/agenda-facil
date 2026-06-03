@@ -58,27 +58,39 @@ Estes itens vêm direto da sua lista — são economias e custos evitados que pa
   para **~US$ 10,2k** (dez/26).
 - Em ambos, o custo **real pago foi US$ 0** (créditos) → a economia é o gasto Azure evitado.
 
-**Resultado (janela mai/2025 → dez/2026, 20 meses):**
+**Resultado — cenário Realista (o que vamos usar), janela mai/2025 → dez/2026:**
 
-| Cenário | Azure evitado (= economia) | Em R$ (~R$ 5,40/US$) |
-|---------|---------------------------:|---------------------:|
-| **Piso** — Azure congelado US$ 5k/mês | **~US$ 100k** | **~R$ 540k** |
-| **Realista** — Azure crescendo com o consumo | **~US$ 150k** | **~R$ 810k** |
+| Marco | Economia de nuvem | Em R$ (~R$ 5,40/US$) |
+|-------|------------------:|---------------------:|
+| **Já realizada até hoje** (jun/2026, ~13 meses) | **~US$ 86k** | **~R$ 464k** |
+| **Total projetado até dez/2026** (20 meses) | **~US$ 150k** | **~R$ 810k** |
 
-- **Já realizado até hoje (jun/2026, ~13 meses):** entre **~US$ 65k** (piso) e **~US$ 86k**
-  (realista) — o resto é projeção até dez/2026.
 - **Economia recorrente pós-créditos (a partir de 2027):** mesmo sem créditos, a AWS
   (~US$ 7,2k) sai **~US$ 3k/mês mais barata** que a Azure equivalente (~US$ 10,2k) →
   **~US$ 36k/ano (~R$ 195k/ano)** de economia estrutural permanente da migração.
 
-> Frase para a conversa: *"Entre zerar a Azure, migrar pra AWS e garantir créditos, a gente
-> evitou da ordem de **US$ 100k a 150k** (R$ 540k–810k) de custo de nuvem até dez/2026 — e a
-> própria migração deixa a conta ~US$ 3k/mês mais barata daqui pra frente, mesmo sem crédito."*
+> Frase para a conversa (foco no feito, não no custo): *"Entre zerar a Azure, migrar pra AWS
+> e garantir créditos, a gente evitou da ordem de **R$ 800 mil** de custo de nuvem até
+> dez/2026 — e a própria migração deixa a conta ~US$ 3k/mês mais barata daqui pra frente,
+> mesmo sem crédito."*
 
-> ⚠️ Câmbio a ~R$ 5,40/US$ (ajuste para a cotação que você preferir). O cenário Realista
-> assume que a Azure cresceria no mesmo ritmo do consumo atual — é uma projeção, então
-> apresente como "da ordem de", não como número fechado. O piso de US$ 100k é praticamente
-> incontestável.
+> ℹ️ Há ainda um piso conservador (Azure congelado em US$ 5k, sem crescimento) de ~US$ 100k /
+> R$ 540k — guarde como "no mínimo isso", caso questionem a projeção. Câmbio a ~R$ 5,40/US$.
+
+---
+
+> ### 🔒 Para um segundo momento (só se a conversa virar para custo/reconhecimento)
+>
+> Você **não** leva isto para a mesa agora — o foco é o trabalho. Mas tenha pronto:
+>
+> - **Seu custo total para a empresa até hoje:** **R$ 462.500**.
+> - **Economia de nuvem já realizada (realista):** **~R$ 464k**.
+> - **Conclusão:** *uma única iniciativa — a migração de nuvem — já cobriu 100% de tudo que
+>   eu custei à Starbem até aqui.* Até dez/2026, só a nuvem chega a **~R$ 810k ≈ 1,75× o meu
+>   custo** — sem contar produto, times, dados, suporte e estratégia.
+>
+> Isso é munição para **um segundo momento**. Se alguém tocar em valor/reconhecimento, esse é
+> o número que encerra a discussão com tranquilidade.
 
 ---
 

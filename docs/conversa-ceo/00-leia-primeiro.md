@@ -1,8 +1,9 @@
 # Conversa com o CEO — material de apoio
 
-Pasta com 3 documentos para dar **visibilidade** do seu trabalho, do **valor gerado** e da
-**economia mensal** que você entrega à Starbem, numa conversa com o CEO (fundador) e o outro
-fundador. **Não há pedido nem negociação** — o objetivo é compartilhar o quadro completo.
+Pasta com 3 documentos para dar **visibilidade do seu trabalho e das suas responsabilidades**
+na Starbem, numa conversa com o CEO (fundador) e o outro fundador. O foco é **o que você tem
+feito**; valor e economia entram como lastro. **Custo/salário fica para um segundo momento** —
+não é tema desta conversa. **Não há pedido nem negociação.**
 
 | # | Documento | Para quê serve |
 |---|-----------|----------------|

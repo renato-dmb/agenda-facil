@@ -1,8 +1,13 @@
 # Roteiro da Conversa — Apresentando sua atuação ao CEO + Fundador
 
-> **Propósito:** dar visibilidade do seu trabalho, do valor gerado e da economia mensal —
-> de forma positiva e tranquila. **Sem pedido, sem negociação.** O objetivo é que eles saiam
-> da conversa com o quadro completo do que passa por você.
+> **Propósito:** dar visibilidade do **seu trabalho e das suas responsabilidades** — de forma
+> positiva e tranquila. O foco é **o que você tem feito**: produto de IA, construção dos
+> times, as áreas que você toca. Valor e economia entram como **lastro**, não como tema
+> central. **Sem pedido, sem negociação.**
+>
+> 💡 **Custo/salário fica para um segundo momento.** Não puxe esse assunto. Se *eles* puxarem,
+> você tem o número pronto (doc 3, bloco "segundo momento"): a migração de nuvem sozinha já
+> cobriu 100% do seu custo. Mas hoje a conversa é sobre **trabalho e responsabilidade**.
 
 ---
 
@@ -21,20 +26,30 @@
 > do tempo, em várias áreas, e achei que valia dar uma visão consolidada pra vocês. Não é pra
 > pedir nada — é pra a gente ter o quadro completo na mão."*
 
-### 2. O panorama dos chapéus (5 min)
-Use o **resumo executivo** e a tabela de **custo de reposição** (R$180k/mês). Conte como você
-foi assumindo CS, Produto, Engenharia, Dados, IT/Suporte e o papel de Principal Engineer.
+### 2. Os feitos que mais orgulham (8–10 min) — *o coração da conversa*
+Comece pelo que você **construiu e entregou**. É aqui que está o foco.
+- 🚀 **Produto 100% IA** — alta procura, MRR rumo a +R$100k, pipeline de parceiros, e a
+  estratégia de evolução com IA para os próximos 12 meses.
+- 👥 **Construção dos times** de Tecnologia, Produto, Dados e Suporte.
+- 📈 **Novo benchmark de performance** da empresa.
 
-> *"Hoje, na prática, são seis chapéis que no mercado seriam cargos separados..."*
+> *"Queria começar pelo que mais me orgulha do que construímos nesse período..."*
 
-### 3. Os destaques de valor e economia (5–8 min)
-Puxe do doc 3:
-- **Valor:** ~R$180k/mês de papéis concentrados numa pessoa.
-- **Economia direta:** nuvem (custo ~0), troca AWS, Agora, Twilio, LLM, contrato de PCs.
-- **Estratégico:** Datalake/preditivo, segurança (Tempest), ExABI, Tiny Teams, novos produtos.
+### 3. O panorama das responsabilidades (5 min)
+Mostre a amplitude do que passa por você hoje — é sobre **responsabilidade**, não custo.
+Conte como foi assumindo CS, Produto, Engenharia, Dados, IT/Suporte e o papel de Principal
+Engineer. Use a tabela de escopo do dossiê.
 
-Foque nos 2–3 números mais fortes que você tiver. Um único dado concreto vale mais que dez
-adjetivos.
+> *"Hoje, na prática, são seis frentes que no mercado seriam cargos separados — e por trás de
+> cada uma há um líder que estou desenvolvendo..."*
+
+### 3b. Lastro de resultado (3–4 min) — *suporte, não foco*
+Só para ancorar que o trabalho gera resultado concreto. Não se alongue aqui.
+- **Economia de nuvem:** ~R$ 800k evitados até dez/2026 (Azure→AWS+créditos).
+- Outras frentes de eficiência: Agora, Twilio, LLM, contrato de PCs.
+
+> ⚠️ **Não** entre em custo/salário/ROI aqui. Isso é segundo momento (doc 3). Aqui você só
+> mostra que entrega gera resultado.
 
 ### 4. Fechamento — leve e aberto (1 min)
 > *"Era isso que eu queria compartilhar. Fico feliz de estar tocando tudo isso e quis garantir

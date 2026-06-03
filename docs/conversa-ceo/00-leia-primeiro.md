@@ -10,7 +10,8 @@ não é tema desta conversa. **Não há pedido nem negociação.**
 | 1 | [`01-dossie-atuacao.md`](./01-dossie-atuacao.md) | Mapa completo dos seus 6 chapéis, por área, com escopo real e impacto. |
 | 2 | [`02-roteiro-conversa.md`](./02-roteiro-conversa.md) | Como apresentar isso de forma positiva e tranquila na reunião. |
 | 3 | [`03-valor-e-economia.md`](./03-valor-e-economia.md) | Valor entregue (R$180k/mês de cargos) + economia direta que você gerou. |
-| ★ | [`apresentacao.html`](./apresentacao.html) | **Slides** das áreas de atuação (abre no navegador; setas para navegar; Ctrl/Cmd+P → PDF). |
+| ★ | [`apresentacao.pptx`](./apresentacao.pptx) | **Apresentação** das áreas de atuação — suba no Google Drive e abra com o Google Slides. |
+| ★ | [`apresentacao.html`](./apresentacao.html) | Mesma apresentação em HTML (abre no navegador; setas para navegar; Ctrl/Cmd+P → PDF). |
 
 ## Como usar
 

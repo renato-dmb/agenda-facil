@@ -28,11 +28,12 @@
 
 ### 2. Os feitos que mais orgulham (8–10 min) — *o coração da conversa*
 Comece pelo que você **construiu e entregou**. É aqui que está o foco.
-- 🚀 **Produto 100% IA** — alta procura, MRR rumo a +R$100k, pipeline de parceiros, e a
-  estratégia de evolução com IA para os próximos 12 meses.
+- 🚀 **Produto 100% IA** — alta procura, R$30k MRR hoje rumo a +R$100k (iFood + TP México),
+  pipeline de parceiros, e a estratégia de evolução com IA para os próximos 12 meses.
 - 👥 **Construção dos times** (15+ pessoas) de Tecnologia, Produto, Dados e Suporte —
   pilares como Barbara, Felipe, Tenório, Leo, Rodrigo, Bruno, Vitor, Humberto e Mila.
-- 📈 **Novo benchmark de performance** da empresa.
+- ✨ **Qualidade percebida do time** — o time virou referência de consistência e
+  confiabilidade (deixe de lado métrica técnica; foque no que eles *sentem* e elogiam).
 
 > *"Queria começar pelo que mais me orgulha do que construímos nesse período..."*
 

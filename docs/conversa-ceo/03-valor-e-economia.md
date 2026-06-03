@@ -99,9 +99,10 @@ Estes itens vêm direto da sua lista — são economias e custos evitados que pa
 Coisas que não dão para precificar fácil, mas que geram ou protegem receita e mitigam risco:
 
 - **Risco mitigado:** consultoria de Segurança (Tempest) e estruturação de Segurança — `[o que evita]`
-- **Receita nova — produto 100% IA:** alta procura, **MRR a caminho de +R$100k até meados de
-  2026 (~R$1,2 mi ARR)**, pipeline de parceiros querendo aderir + estratégia de evolução com
-  IA para os próximos 12 meses. *(Este é o maior gerador de receita da lista.)*
+- **Receita nova — produto 100% IA:** alta procura; **R$30k MRR hoje, a caminho de +R$100k
+  até meados de 2026** (puxado por **iFood** e **TotalPass México**), pipeline de parceiros
+  querendo aderir + estratégia de evolução com IA para os próximos 12 meses. *(Este é o maior
+  gerador de receita da lista.)*
 - **Receita habilitada:** novos produtos para parceiros (Shapeme), canal WhatsApp para
   pacientes, evolução da jornada B2C — `[crescimento / receita]`
 - **Receita protegida:** estabilidade da operação (análise semanal de bugs estruturais),

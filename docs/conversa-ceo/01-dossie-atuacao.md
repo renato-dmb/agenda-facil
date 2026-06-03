@@ -25,11 +25,13 @@ Antes do detalhe por área, os feitos que mais marcaram:
 1. **Construção dos times de Tecnologia, Produto, Dados e Suporte** — **mais de 15 pessoas**
    contratadas e formadas, que hoje sustentam a operação. Entre os pilares que trouxe e/ou
    desenvolvi: **Barbara, Felipe, Tenório, Leo, Rodrigo, Bruno, Vitor, Humberto e Mila**.
-2. **Novo benchmark de performance da empresa** — elevei o padrão de entrega e operação.
-   `[de X para Y — qual métrica]`
-3. **Novo produto 100% baseado em IA** — alta procura de clientes, **MRR a caminho de
-   +R$100k até meados de 2026** (~R$1,2 mi ARR), pipeline de parceiros querendo aderir, e uma
-   **estratégia de evolução de produto com IA para os próximos 12 meses**.
+2. **Salto na qualidade percebida do time e da operação** — o time passou a ser reconhecido
+   pela consistência e confiabilidade das entregas, e virou referência interna de excelência.
+   `[exemplos concretos: elogios de clientes/parceiros, problemas que pararam de acontecer]`
+3. **Novo produto 100% baseado em IA** — alta procura de clientes; **MRR de R$30k/mês hoje,
+   com trajetória para +R$100k até meados de 2026** (impulsionado por **iFood** e **TotalPass
+   México**); pipeline de parceiros querendo aderir e **estratégia de evolução de produto com
+   IA para os próximos 12 meses**.
 4. **Economia de nuvem** — ~US$ 100k–150k (R$ 540k–810k) evitados até dez/2026 (ver doc 3).
 
 ---
@@ -202,7 +204,7 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
 ## Os destaques (leve na ponta da língua)
 
-1. **Novo produto 100% IA** rumo a **+R$100k MRR** (~R$1,2 mi ARR) com pipeline de parceiros.
+1. **Novo produto 100% IA** — R$30k MRR hoje, rumo a **+R$100k** (iFood + TP México).
 2. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
 3. **~US$ 100k–150k** (R$ 540k–810k) de custo de nuvem evitado (Azure→AWS+créditos) — ver doc 3.
-4. **Construção dos times** (15+ pessoas) de Tech, Produto, Dados e Suporte + novo benchmark.
+4. **Construção dos times** (15+ pessoas) + salto na qualidade percebida do time.

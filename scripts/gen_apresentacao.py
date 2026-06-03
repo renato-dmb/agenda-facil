@@ -144,6 +144,23 @@ def split(lst):
     return lst[:h], lst[h:]
 
 
+def est_height(items, size, width_in):
+    """Estimativa (em polegadas) da altura ocupada por uma lista de bullets,
+    considerando quebra de linha aproximada."""
+    import math
+    cpl = max(18, int(width_in * 72 / (size * 0.50)))  # chars por linha
+    lines = 0
+    for it in items:
+        txt = it.replace("**", "")
+        lines += max(1, math.ceil(len(txt) / cpl))
+    line_h = size * 1.28 / 72
+    gap = 7 / 72
+    return lines * line_h + len(items) * gap
+
+
+REGION_TOP, REGION_H = 2.55, 4.45  # área útil do corpo para o bloco de conteúdo
+
+
 # Estrutura de slides — Customer Success por ÚLTIMO ---------------------------
 DATA = [
     {"type": "cover"},
@@ -215,6 +232,8 @@ CARD = RGBColor(0xF5, 0xF6, 0xF8)
 LINE = RGBColor(0xE2, 0xE5, 0xEA)
 TITLE_FONT = "Funnel Display"
 BODY_FONT = "Calibri"
+LOGO_PATH = "docs/conversa-ceo/assets/starbem-logo-white.png"
+LOGO_AR = 600 / 159  # razão largura/altura da logo
 
 
 def build_pptx():
@@ -270,15 +289,12 @@ def build_pptx():
                 pass
         return sh
 
-    def logo(s, l, t, big=False):
-        tf = box(s, l, t, 4.5, 0.6, anchor=MSO_ANCHOR.MIDDLE)
-        p = tf.paragraphs[0]
-        run(p, "★ ", 26 if big else 22, WHITE, bold=True)
-        run(p, "starbem", 24 if big else 20, WHITE, bold=True, font=TITLE_FONT)
+    def logo(s, l, t, h=0.42):
+        s.shapes.add_picture(LOGO_PATH, Inches(l), Inches(t), height=Inches(h))
 
     def topbar(s, running):
         rect(s, 0, 0, 13.333, 1.0, ORANGE, grad=(ORANGE_D, ORANGE_L))
-        logo(s, 0.55, 0.2)
+        logo(s, 0.6, 0.29, h=0.42)
         if running:
             tf = box(s, 6.0, 0.2, 6.8, 0.6, anchor=MSO_ANCHOR.MIDDLE)
             p = tf.paragraphs[0]; p.alignment = 2
@@ -311,7 +327,7 @@ def build_pptx():
         if t == "cover":
             s = new()
             rect(s, 0, 0, 13.333, 7.5, ORANGE, grad=(ORANGE_D, ORANGE_L))
-            logo(s, 0.7, 0.6, big=True)
+            logo(s, 0.72, 0.6, h=0.62)
             p = box(s, 0.75, 2.5, 9.5, 2.2).paragraphs[0]
             run(p, "Áreas de Atuação\n& Impacto", 48, WHITE, bold=True, font=TITLE_FONT)
             pp = box(s, 0.78, 4.9, 8.6, 1.3); q = pp.paragraphs[0]
@@ -355,22 +371,35 @@ def build_pptx():
         elif t == "detail":
             title(s, spec["title"])
             cols = spec["cols"]; size = spec.get("size", 13)
-            top, H = 2.65, 4.0
             no_head = all(h is None for h, _ in cols)
+            pad = 0.55  # padding vertical interno do cartão
             if no_head and len(cols) == 2:
-                rect(s, 0.6, top, 12.13, H, CARD, line=LINE, rounded=True)
-                bullets(box(s, 0.95, top + 0.3, 5.6, H - 0.6), cols[0][1], size)
-                bullets(box(s, 6.75, top + 0.3, 5.6, H - 0.6), cols[1][1], size)
+                ch = max(est_height(cols[0][1], size, 5.0),
+                         est_height(cols[1][1], size, 5.0)) + pad
+                ch = min(max(ch, 1.2), REGION_H)
+                top = REGION_TOP + (REGION_H - ch) / 2
+                rect(s, 0.6, top, 12.13, ch, CARD, line=LINE, rounded=True)
+                bullets(box(s, 0.95, top + 0.28, 5.6, ch - 0.5), cols[0][1], size)
+                bullets(box(s, 6.75, top + 0.28, 5.6, ch - 0.5), cols[1][1], size)
             elif spec.get("wide") or len(cols) == 1:
+                bsize = max(size, 15)
+                ch = min(max(est_height(cols[0][1], bsize, 11.0) + pad, 1.0), REGION_H - 0.55)
+                blk = 0.55 + ch
+                top = REGION_TOP + (REGION_H - blk) / 2
                 bar(s, cols[0][0] or "Detalhamento", 0.6, top, 12.13)
-                rect(s, 0.6, top + 0.55, 12.13, H - 0.55, CARD, line=LINE, rounded=True)
-                bullets(box(s, 0.95, top + 0.8, 11.4, H - 1.05), cols[0][1], max(size, 15))
+                rect(s, 0.6, top + 0.55, 12.13, ch, CARD, line=LINE, rounded=True)
+                bullets(box(s, 0.95, top + 0.55 + 0.26, 11.4, ch - 0.45), cols[0][1], bsize)
             else:
+                ch = max(est_height(cols[0][1], size, 4.8),
+                         est_height(cols[1][1], size, 4.8)) + pad
+                ch = min(max(ch, 1.0), REGION_H - 0.55)
+                blk = 0.55 + ch
+                top = REGION_TOP + (REGION_H - blk) / 2
                 for idx, (h, items) in enumerate(cols):
                     l = 0.6 + idx * 6.33
                     bar(s, h, l, top, 5.8)
-                    rect(s, l, top + 0.55, 5.8, H - 0.55, CARD, line=LINE, rounded=True)
-                    bullets(box(s, l + 0.35, top + 0.8, 5.1, H - 1.05), items, size)
+                    rect(s, l, top + 0.55, 5.8, ch, CARD, line=LINE, rounded=True)
+                    bullets(box(s, l + 0.35, top + 0.55 + 0.26, 5.1, ch - 0.45), items, size)
 
         elif t == "times":
             title(s, "Construí os times que sustentam a operação")
@@ -444,9 +473,13 @@ def build_html():
     def ul(items):
         return "<ul>" + "".join(f"<li>{md(i)}</li>" for i in items) + "</ul>"
 
+    import base64
+    logo_uri = "data:image/png;base64," + base64.b64encode(open(LOGO_PATH, "rb").read()).decode()
+
     def topbar(running):
         r = f'<div class="run">{running}</div>' if running else ""
-        return f'<div class="topbar"><div class="logo">★ <span>starbem</span></div>{r}</div>'
+        return (f'<div class="topbar"><img class="logo" src="{logo_uri}" alt="starbem"/>'
+                f'{r}</div>')
 
     def cols_html(cols, wide):
         no_head = all(h is None for h, _ in cols)
@@ -468,7 +501,7 @@ def build_html():
         t = spec["type"]; run = spec.get("running", "")
         if t == "cover":
             slides.append(f'''<section class="slide active cover">
-<div class="logo big">★ <span>starbem</span></div>
+<img class="logo big" src="{logo_uri}" alt="starbem"/>
 <h1>Áreas de Atuação<br>& Impacto</h1>
 <div class="sub">Uma visão consolidada e detalhada de todas as frentes que conduzo hoje na companhia — do produto à infraestrutura, passando por dados, suporte, times e Customer Success.</div>
 <div class="who">{PRESENTER} · Tecnologia, Produto, Dados &amp; CS · Junho/2026</div></section>''')
@@ -526,8 +559,7 @@ body{font-family:Calibri,'Segoe UI',Roboto,Arial,sans-serif;background:#fff;colo
 .slide{position:absolute;inset:0;display:none;flex-direction:column;background:#fff;animation:fade .4s ease}
 .slide.active{display:flex}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .topbar{height:13vh;min-height:74px;background:linear-gradient(90deg,var(--orange-d),var(--orange-l));display:flex;align-items:center;justify-content:space-between;padding:0 4vw;flex:0 0 auto}
-.logo{font-family:var(--title);font-weight:800;color:#fff;font-size:1.7rem;letter-spacing:.02em}
-.logo span{font-weight:800}.logo.big{font-size:2.2rem}
+.logo{height:38px;width:auto;display:block}.logo.big{height:54px;margin-bottom:1.4rem}
 .run{font-family:var(--title);color:#fff;font-weight:700;font-size:1.05rem;opacity:.95}
 .body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3.5vh 4vw}
 h1{font-family:var(--title);font-size:3.8rem;line-height:1.05;font-weight:800;color:#fff}

@@ -36,6 +36,29 @@ Dados que você passou:
 
 ---
 
+## A âncora: R$180k/mês de papéis concentrados em você
+
+Antes de pedir, fixe o número que sustenta tudo (detalhe no dossiê, doc 1):
+
+| Chapéu | Equiv. mercado/mês |
+|--------|-------------------:|
+| Diretoria de Engenharia | R$ 40k |
+| Diretoria de Dados | R$ 35k |
+| Diretoria de CS | R$ 30k |
+| Diretoria de Produto | R$ 30k |
+| Principal Engineer | R$ 30k |
+| Liderança de IT & Suporte | R$ 15k |
+| **Total** | **R$ 180k/mês (~R$ 2,16 mi/ano)** |
+
+> **Como usar (sem soar ganancioso):** o número **não é o seu pedido** — é a régua. Ele mostra
+> o tamanho do gap entre o que você custaria a mercado e o que você recebe hoje. Use para
+> justificar um salto relevante (não marginal) e para enquadrar o equity: *"mesmo que o caixa
+> não comporte chegar perto disso agora, faz sentido compensar o gap via participação no
+> sucesso do M&A."*
+>
+> ⚠️ Não exija os R$180k. Exigir o teto fecha a conversa. Use o número como **contexto** e
+> ancore seu pedido de salário num ponto **defensável e específico** (próxima seção).
+
 ## Os 3 eixos do pedido (negocie como pacote, não item isolado)
 
 ### Eixo 1 — Cargo e escopo formal *(geralmente o mais fácil de conceder)*

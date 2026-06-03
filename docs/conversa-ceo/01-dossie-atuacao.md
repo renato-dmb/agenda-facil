@@ -1,103 +1,191 @@
-# Dossiê de Atuação e Impacto
+# Dossiê de Atuação e Impacto — Starbem
 
-> **Objetivo:** dar visibilidade clara e organizada de tudo que você toca hoje na Starbank.
-> Não é uma lista de tarefas — é uma demonstração de **escopo, responsabilidade e impacto**.
-> Preencha os `[...]`. Onde puder, troque adjetivos por **números e resultados**.
-
----
-
-## Resumo executivo (1 parágrafo — leia primeiro na conversa)
-
-> Hoje eu atuo, na prática, como liderança de **[Produto, Tecnologia (Engenharia, Dados,
-> Suporte) e Customer Success]** — areas que somadas representam `[X]` pessoas, `[Y]`
-> projetos de inovação em andamento e os OKRs de `[áreas]`. Nos últimos `[6/12]` meses,
-> isso se traduziu em `[2-3 resultados de maior impacto: ex. "redução de X% no churn",
-> "lançamento do produto Z", "estabilização da plataforma com queda de Y% nos incidentes"]`.
-
-*(Esse parágrafo é o seu "elevator pitch". Tudo abaixo é a fundamentação.)*
+> **Objetivo:** dar visibilidade clara do que você opera hoje na Starbem. Não é uma lista de
+> tarefas — é a demonstração de que **uma pessoa acumula múltiplos cargos de diretoria e
+> liderança**, com um custo de reposição de mercado da ordem de **R$180k/mês**.
+> Onde houver `[...]`, complete com **número/resultado** (é o que mais convence).
 
 ---
 
-## Visão geral — escopo formal vs. escopo real
+## Resumo executivo (abra a conversa com isto)
 
-Essa tabela é o **coração do argumento**. Mostra a distância entre o que está no seu
-cargo/contrato e o que você de fato carrega.
-
-| Área | No meu cargo formal? | Atuação real hoje | Quem cobriria se eu saísse? |
-|------|----------------------|-------------------|------------------------------|
-| Produto | `[Sim/Não/Parcial]` | `[liderança / execução / estratégia]` | `[...]` |
-| Engenharia | `[...]` | `[...]` | `[...]` |
-| Dados | `[...]` | `[...]` | `[...]` |
-| Suporte | `[...]` | `[...]` | `[...]` |
-| Customer Success | `[...]` | `[...]` | `[...]` |
-| Inovação / OKRs | `[...]` | `[...]` | `[...]` |
-
-> **Mensagem implícita:** "Meu cargo descreve uma fração do que eu opero. Quero alinhar os dois."
+> *"Hoje eu acumulo, na prática, seis chapéis que no mercado seriam cargos distintos:
+> Diretoria de CS, Diretoria de Produto, Diretoria de Engenharia, Diretoria de Dados,
+> Liderança de IT & Suporte e Principal Engineer — além de desenvolver os líderes de cada
+> uma dessas áreas e atuar na estratégia da Starbem. Somados a preço de mercado, esses
+> papéis representam cerca de **R$180 mil/mês**. Eu entrego isso operando muito além do
+> horário, e por isso quero alinhar com vocês o meu papel daqui pra frente."*
 
 ---
 
-## Detalhamento por área
+## O argumento central: custo de reposição
 
-> Para cada área, preencha: **(a)** o que você toca, **(b)** o resultado/impacto (com número
-> se possível), **(c)** o que estava pior antes e melhorou com você.
+Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
-### 1. Produto
-- **O que toco:** `[roadmap, priorização, discovery, relação com stakeholders...]`
-- **Principais entregas (últimos meses):** `[...]`
-- **Impacto / resultado:** `[ex.: lançamento de X, adoção de Y%, NPS de produto...]`
-- **Antes x depois:** `[...]`
+| Chapéu | Equivalente de mercado (mês) |
+|--------|------------------------------:|
+| Diretoria de Engenharia | R$ 40.000 |
+| Diretoria de Dados | R$ 35.000 |
+| Diretoria de CS | R$ 30.000 |
+| Diretoria de Produto | R$ 30.000 |
+| Principal Engineer | R$ 30.000 |
+| Liderança de IT & Suporte | R$ 15.000 |
+| **Total (papéis precificados)** | **R$ 180.000 / mês** |
+| | **≈ R$ 2,16 mi / ano** |
 
-### 2. Engenharia
-- **O que toco:** `[arquitetura, time, processos, qualidade, deploys...]`
-- **Principais entregas:** `[...]`
-- **Impacto / resultado:** `[ex.: redução de incidentes, lead time, cobertura de testes...]`
-- **Antes x depois:** `[...]`
+> **Não precificado acima, mas real:** o desenvolvimento dos líderes de CS, Produto, Eng e
+> Dados (people management) e a atuação na **estratégia da Starbem**. São camadas *adicionais*.
 
-### 3. Dados
-- **O que toco:** `[infraestrutura de dados, OKRs, dashboards, modelos, governança...]`
-- **Principais entregas:** `[...]`
-- **Impacto / resultado:** `[ex.: decisões habilitadas, métrica que passou a existir...]`
-- **Antes x depois:** `[...]`
-
-### 4. Suporte
-- **O que toco:** `[estrutura, SLAs, ferramentas, time...]`
-- **Principais entregas:** `[...]`
-- **Impacto / resultado:** `[ex.: tempo de resposta, volume de tickets, satisfação...]`
-- **Antes x depois:** `[...]`
-
-### 5. Customer Success (assumido recentemente)
-- **O que toco:** `[onboarding, retenção, expansão, relação com contas-chave...]`
-- **Principais entregas:** `[...]`
-- **Impacto / resultado:** `[ex.: churn, expansão de receita, retenção...]`
-- **Antes x depois:** `[...]`
-
-### 6. Projetos de Inovação / OKRs
-- **Projetos sob meu guarda-chuva:** `[liste: nome — status — impacto esperado]`
-  - `[Projeto A — em andamento — ...]`
-  - `[Projeto B — ...]`
-- **OKRs que respondo:** `[...]`
+> **Mensagem para a conversa:** *"Não estou pedindo R$180k — estou mostrando a ordem de
+> grandeza do que está concentrado em uma pessoa, e o risco que isso representa para a
+> empresa. Quero que a gente alinhe cargo e reconhecimento a essa realidade."*
 
 ---
 
-## Sinais de sobrecarga (use com cuidado — ver nota)
+## Detalhamento por chapéu
 
-Liste fatos, não desabafo. O objetivo é mostrar que a estrutura atual **não é sustentável**
-e precisa de decisão (mais gente, redistribuição, ou reconhecimento do escopo).
+### 1. Diretoria de CS — *equiv. R$30k/mês*
+- Estruturação da área e da estrutura de CSM
+- Novo modelo de operação de implantação
+- Troca de liderança de CX
+- Implementação de automação
+- Processo fim a fim: **Vendas → Implantação → Manutenção → Expansão**
+- Novo modelo de operação (Thaís)
 
-- Áreas acumuladas no período: `[de N para M áreas em X meses]`
-- Trabalho recorrente fora do horário: `[ex.: "noites e fins de semana viraram regra, não exceção"]`
-- Riscos de concentração: `[o que trava se você tirar férias / ficar doente]`
+**Camada de liderança (CS):**
+- Plano de transformação da área
+- Desenvolvimento do líder que ainda não está pronto para voar solo
+- Apoio em todos os processos seletivos e desenvolvimento do líder para escolher pessoas
+- Atuação direta na troca de pessoas-chave do time
 
-> **Nota de tom:** sobrecarga é um argumento de **sustentabilidade do negócio**, não de
-> reclamação pessoal. A pergunta que você planta na cabeça do CEO é: *"O que acontece com a
-> empresa se essa pessoa parar — ou sair?"*
+> Impacto / números: `[ex.: churn, retenção, NPS, receita de expansão, tempo de implantação]`
 
 ---
 
-## Os 3 fatos que, sozinhos, sustentam a conversa
+### 2. Diretoria de Produto — *equiv. R$30k/mês*
 
-Se você tivesse 30 segundos, quais 3 coisas provam seu valor? Escolha as mais fortes acima.
+**5 OKRs.** Frentes:
 
-1. `[...]`
-2. `[...]`
-3. `[...]`
+**Paciente (B2C)**
+- Uso de múltiplos serviços — Cross Service
+- Novo canal WhatsApp para pacientes
+- StarBrain — cérebro central com visão unificada do paciente
+- Shapeme — jornada comercial e desenho da jornada
+- Evolução da jornada B2C
+- Acompanhamento de faturamento e crescimento de B2C
+
+**Profissional**
+- Correção e acompanhamento de videochamadas
+- Evolução de NPS; pesquisa de qualidade de atendimento; pesquisa de infraestrutura profissional
+- Gravação e transcrição de chamada
+- Construção de prontuário automatizado + retroalimentação do cérebro central
+- Planejamento de automações para o profissional (cadastro, consumo mensal, notas fiscais etc.)
+- Controle de agendas e faturamento (TotalPass)
+- Evolução e análise mensal de qualidade e melhorias
+
+**RH (produto)**
+- Construção/evolução do NR1 e do Portal RH
+- Correção de problemas NR1 (Eduardo O.)
+- Portal RH com valor real para o RH
+- Multi-tiers de NR1 (Produto de 1 a 4) para diferentes demandas de clientes
+- Reuniões comerciais com clientes — tirar dúvidas sobre NR1
+- Tratamento de dores em falhas de API em cliente B2B (iFood)
+
+**Parcerias**
+- Análise de qualidade da API V2 e atuação em problemas crônicos (ex.: iFood)
+- Apoio à estrutura do time com pouco headcount
+- Reuniões comerciais com parceiros (iFood, TotalPass, Claro etc.)
+- Evolução e acompanhamento de custos mensais de LLM
+- Construção e evolução de novos produtos para parceiros (ex.: Shapeme)
+
+**Camada de liderança (Produto):**
+- Plano de evolução da área (dificuldade de escala)
+- Desenvolvimento do líder que ainda não está pronto para voar solo
+- Apoio em processos seletivos e na escolha de pessoas
+- Atuação direta na troca de pessoas-chave
+
+> Impacto / números: `[ex.: crescimento B2C, NPS, nº de serviços ativos, receita de parcerias]`
+
+---
+
+### 3. Diretoria de Engenharia — *equiv. R$40k/mês*
+- Evolução e acompanhamento semanal da qualidade de chamada
+- Consultoria de Segurança — Tempest; próximos passos da estruturação de Segurança
+- Shapeme — construção do produto
+- Visão e construção da plataforma **Tiny Teams** + novo modelo de operação
+- Camada Agêntica Starbem — **ExABI**
+
+**Camada de liderança (Engenharia):**
+- Desenvolvimento da líder para atuação estratégica no business
+- Atuação direta na troca de pessoas-chave
+- Expansão de consciência para novos modelos de operação de engenharia
+- Aumento de escopo: engenharia cross-área (ex.: CS AI Engineering)
+
+> Impacto / números: `[ex.: incidentes, lead time, qualidade de chamada %, segurança]`
+
+---
+
+### 4. Diretoria de Dados — *equiv. R$35k/mês*
+- Estruturação e construção do **Datalake** e da camada inteligente da Starbem (análises
+  prescritivas e preditivas)
+- Construção e manutenção da camada de inteligência do negócio
+- Reestruturação da arquitetura de dados
+- Atuação na contratação de novos profissionais
+
+**Camada de liderança (Dados):**
+- PDI e desenvolvimento do time
+- Acompanhamento semanal de tarefas
+- People management para engajamento (Rodrigo)
+- Plano de crescimento: novo líder + segundo analista focado em análise preditiva e impacto
+  financeiro
+
+> Impacto / números: `[ex.: decisões habilitadas por dados, previsões, economia gerada]`
+
+---
+
+### 5. Liderança de IT & Suporte — *equiv. R$15k/mês*
+- Construção e manutenção da estrutura de tickets e suporte
+- Acompanhamento da evolução de tickets
+- Aproximação Suporte ↔ CS ↔ Produto para evolução contínua
+- Estratégia de redução de custos no contrato de aluguel de PCs
+- Definição da operação da área
+
+> Impacto / números: `[ex.: tempo de resposta, volume, economia no contrato de PCs]`
+
+---
+
+### 6. Principal Engineer — *equiv. R$30k/mês*
+- Análises semanais de bugs estruturais da operação (com Júlio)
+- Desenho arquitetural das soluções da Starbem
+- Relacionamento com provedor de nuvem; **troca de parceiro AWS**
+- Acompanhamento mensal de custos de nuvem — **manutenção de custo ~0 de infraestrutura**
+- Relacionamento estratégico com fornecedores (Agora.io, Twilio)
+- Negociação de contratos para redução de custos (Agora, Twilio)
+
+> Impacto / números: `[ex.: % de redução de custo de nuvem/fornecedores, R$ economizados]`
+
+---
+
+### 7. Estratégia Starbem *(cross-área — camada adicional)*
+- Apoio na estruturação de OKRs
+- Influência em múltiplas áreas e líderes para ampliar impacto
+- Evolução dos processos de contratação para atrair mais talentos
+- Discussões estratégicas sobre o futuro dos produtos e construção de vantagem competitiva
+
+---
+
+## Sinais de sobrecarga (fatos, não desabafo)
+
+- **6 cargos** concentrados em 1 pessoa, + desenvolvimento de 4 líderes, + estratégia
+- Trabalho recorrente fora do horário: `[noites/fins de semana — frequência]`
+- **Risco de concentração:** se você parar (férias, saúde, saída), `[o que trava]`
+
+> A pergunta que isso planta no CEO: *"O que acontece com a empresa se essa pessoa parar?"*
+
+---
+
+## Os 3 fatos que sustentam tudo (escolha os mais fortes e leve na ponta da língua)
+
+1. **R$180k/mês** em papéis de mercado concentrados em mim.
+2. `[seu maior resultado concreto — com número]`
+3. `[risco de concentração / dependência da operação em você]`

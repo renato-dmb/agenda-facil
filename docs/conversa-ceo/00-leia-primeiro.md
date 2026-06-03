@@ -1,7 +1,7 @@
 # Conversa com o CEO — material de apoio
 
 Pasta com 3 documentos para preparar a conversa com o CEO (fundador) e o outro fundador
-sobre o seu papel, escopo e crescimento na Starbank.
+sobre o seu papel, escopo e crescimento na Starbem.
 
 | # | Documento | Para quê serve |
 |---|-----------|----------------|

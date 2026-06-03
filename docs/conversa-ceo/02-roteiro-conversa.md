@@ -30,7 +30,8 @@
 Comece pelo que você **construiu e entregou**. É aqui que está o foco.
 - 🚀 **Produto 100% IA** — alta procura, MRR rumo a +R$100k, pipeline de parceiros, e a
   estratégia de evolução com IA para os próximos 12 meses.
-- 👥 **Construção dos times** de Tecnologia, Produto, Dados e Suporte.
+- 👥 **Construção dos times** (15+ pessoas) de Tecnologia, Produto, Dados e Suporte —
+  pilares como Barbara, Felipe, Tenório, Leo, Rodrigo, Bruno, Vitor, Humberto e Mila.
 - 📈 **Novo benchmark de performance** da empresa.
 
 > *"Queria começar pelo que mais me orgulha do que construímos nesse período..."*

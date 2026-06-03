@@ -22,8 +22,9 @@
 
 Antes do detalhe por área, os feitos que mais marcaram:
 
-1. **Construção dos times de Tecnologia, Produto, Dados e Suporte** — estruturei as áreas e
-   formei os times que hoje sustentam a operação. `[nº de pessoas contratadas/formadas]`
+1. **Construção dos times de Tecnologia, Produto, Dados e Suporte** — **mais de 15 pessoas**
+   contratadas e formadas, que hoje sustentam a operação. Entre os pilares que trouxe e/ou
+   desenvolvi: **Barbara, Felipe, Tenório, Leo, Rodrigo, Bruno, Vitor, Humberto e Mila**.
 2. **Novo benchmark de performance da empresa** — elevei o padrão de entrega e operação.
    `[de X para Y — qual métrica]`
 3. **Novo produto 100% baseado em IA** — alta procura de clientes, **MRR a caminho de
@@ -204,4 +205,4 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 1. **Novo produto 100% IA** rumo a **+R$100k MRR** (~R$1,2 mi ARR) com pipeline de parceiros.
 2. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
 3. **~US$ 100k–150k** (R$ 540k–810k) de custo de nuvem evitado (Azure→AWS+créditos) — ver doc 3.
-4. **Construção dos times** de Tech, Produto, Dados e Suporte + novo benchmark de performance.
+4. **Construção dos times** (15+ pessoas) de Tech, Produto, Dados e Suporte + novo benchmark.

@@ -87,6 +87,9 @@ Estes itens vêm direto da sua lista — são economias e custos evitados que pa
 Coisas que não dão para precificar fácil, mas que geram ou protegem receita e mitigam risco:
 
 - **Risco mitigado:** consultoria de Segurança (Tempest) e estruturação de Segurança — `[o que evita]`
+- **Receita nova — produto 100% IA:** alta procura, **MRR a caminho de +R$100k até meados de
+  2026 (~R$1,2 mi ARR)**, pipeline de parceiros querendo aderir + estratégia de evolução com
+  IA para os próximos 12 meses. *(Este é o maior gerador de receita da lista.)*
 - **Receita habilitada:** novos produtos para parceiros (Shapeme), canal WhatsApp para
   pacientes, evolução da jornada B2C — `[crescimento / receita]`
 - **Receita protegida:** estabilidade da operação (análise semanal de bugs estruturais),
@@ -99,10 +102,11 @@ Coisas que não dão para precificar fácil, mas que geram ou protegem receita e
 
 ## 4. Resumo de uma linha (para fechar a apresentação)
 
-> *"Resumindo: ~R$180k/mês de cargos concentrados em mim; só na nuvem, ~US$ 100k–150k
-> (R$ 540k–810k) de custo evitado até dez/2026 — e ~US$ 3k/mês de economia estrutural daí pra
-> frente; além de receita habilitada e risco mitigado em segurança e operação. Quis dar essa
-> visibilidade pra que vocês tenham o quadro completo do que tem passado por aqui."*
+> *"Resumindo: lancei um produto 100% IA rumo a +R$100k MRR com fila de parceiros; montei os
+> times de Tech, Produto, Dados e Suporte; tenho ~R$180k/mês de cargos concentrados em mim; e
+> só na nuvem evitei ~US$ 100k–150k (R$ 540k–810k) até dez/2026, com ~US$ 3k/mês de economia
+> estrutural daí pra frente. Quis dar essa visibilidade pra vocês terem o quadro completo do
+> que tem passado por aqui."*
 
 *(Sem pedido. A visibilidade fala por si — e abre a porta para o que vier no futuro,
 no tempo de vocês.)*

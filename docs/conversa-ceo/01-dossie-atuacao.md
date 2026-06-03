@@ -18,6 +18,21 @@
 
 ---
 
+## Principais conquistas (visão macro)
+
+Antes do detalhe por área, os feitos que mais marcaram:
+
+1. **Construção dos times de Tecnologia, Produto, Dados e Suporte** — estruturei as áreas e
+   formei os times que hoje sustentam a operação. `[nº de pessoas contratadas/formadas]`
+2. **Novo benchmark de performance da empresa** — elevei o padrão de entrega e operação.
+   `[de X para Y — qual métrica]`
+3. **Novo produto 100% baseado em IA** — alta procura de clientes, **MRR a caminho de
+   +R$100k até meados de 2026** (~R$1,2 mi ARR), pipeline de parceiros querendo aderir, e uma
+   **estratégia de evolução de produto com IA para os próximos 12 meses**.
+4. **Economia de nuvem** — ~US$ 100k–150k (R$ 540k–810k) evitados até dez/2026 (ver doc 3).
+
+---
+
 ## O valor entregue: custo de reposição
 
 Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
@@ -184,8 +199,9 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
 ---
 
-## Os 3 destaques (leve na ponta da língua)
+## Os destaques (leve na ponta da língua)
 
-1. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
-2. `[seu maior resultado concreto — com número]`
+1. **Novo produto 100% IA** rumo a **+R$100k MRR** (~R$1,2 mi ARR) com pipeline de parceiros.
+2. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
 3. **~US$ 100k–150k** (R$ 540k–810k) de custo de nuvem evitado (Azure→AWS+créditos) — ver doc 3.
+4. **Construção dos times** de Tech, Produto, Dados e Suporte + novo benchmark de performance.

@@ -1,24 +1,24 @@
 # Dossiê de Atuação e Impacto — Starbem
 
-> **Objetivo:** dar visibilidade clara do que você opera hoje na Starbem. Não é uma lista de
-> tarefas — é a demonstração de que **uma pessoa acumula múltiplos cargos de diretoria e
-> liderança**, com um custo de reposição de mercado da ordem de **R$180k/mês**.
+> **Objetivo:** dar visibilidade clara do que você opera hoje na Starbem e do valor que isso
+> gera para a empresa. Não é uma lista de tarefas, e **não é um pedido** — é um retrato
+> honesto do escopo, do impacto e da economia que passam pela sua atuação.
 > Onde houver `[...]`, complete com **número/resultado** (é o que mais convence).
 
 ---
 
 ## Resumo executivo (abra a conversa com isto)
 
-> *"Hoje eu acumulo, na prática, seis chapéis que no mercado seriam cargos distintos:
-> Diretoria de CS, Diretoria de Produto, Diretoria de Engenharia, Diretoria de Dados,
-> Liderança de IT & Suporte e Principal Engineer — além de desenvolver os líderes de cada
-> uma dessas áreas e atuar na estratégia da Starbem. Somados a preço de mercado, esses
-> papéis representam cerca de **R$180 mil/mês**. Eu entrego isso operando muito além do
-> horário, e por isso quero alinhar com vocês o meu papel daqui pra frente."*
+> *"Queria dar visibilidade do que hoje passa por mim na prática. Acabei acumulando seis
+> chapéis que no mercado seriam cargos distintos: Diretoria de CS, Diretoria de Produto,
+> Diretoria de Engenharia, Diretoria de Dados, Liderança de IT & Suporte e Principal
+> Engineer — além de desenvolver os líderes de cada uma dessas áreas e atuar na estratégia
+> da Starbem. Somando o equivalente de mercado, são cerca de **R$180 mil/mês** em papéis
+> concentrados numa pessoa só. Quero compartilhar esse panorama e o valor que ele tem gerado."*
 
 ---
 
-## O argumento central: custo de reposição
+## O valor entregue: custo de reposição
 
 Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
@@ -36,9 +36,9 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 > **Não precificado acima, mas real:** o desenvolvimento dos líderes de CS, Produto, Eng e
 > Dados (people management) e a atuação na **estratégia da Starbem**. São camadas *adicionais*.
 
-> **Mensagem para a conversa:** *"Não estou pedindo R$180k — estou mostrando a ordem de
-> grandeza do que está concentrado em uma pessoa, e o risco que isso representa para a
-> empresa. Quero que a gente alinhe cargo e reconhecimento a essa realidade."*
+> **Mensagem para a conversa:** *"Não é sobre pedir nada — é sobre dar visibilidade da ordem
+> de grandeza do que está concentrado numa pessoa só, e do valor que isso entrega para a
+> Starbem todo mês."*
 
 ---
 
@@ -174,18 +174,18 @@ Quanto a Starbem pagaria, a mercado, para repor o que você carrega hoje:
 
 ---
 
-## Sinais de sobrecarga (fatos, não desabafo)
+## Dimensão da concentração (fatos, sem desabafo)
 
 - **6 cargos** concentrados em 1 pessoa, + desenvolvimento de 4 líderes, + estratégia
-- Trabalho recorrente fora do horário: `[noites/fins de semana — frequência]`
-- **Risco de concentração:** se você parar (férias, saúde, saída), `[o que trava]`
+- Operação recorrente fora do horário para sustentar tudo: `[noites/fins de semana — frequência]`
+- **Pontos que dependem de mim hoje:** `[o que passa só por você]`
 
-> A pergunta que isso planta no CEO: *"O que acontece com a empresa se essa pessoa parar?"*
+> Isso é visibilidade pura — mostrar o tamanho do que está concentrado, sem cobrar nada.
 
 ---
 
-## Os 3 fatos que sustentam tudo (escolha os mais fortes e leve na ponta da língua)
+## Os 3 destaques (leve na ponta da língua)
 
-1. **R$180k/mês** em papéis de mercado concentrados em mim.
+1. **R$180k/mês** em papéis de mercado concentrados numa pessoa.
 2. `[seu maior resultado concreto — com número]`
-3. `[risco de concentração / dependência da operação em você]`
+3. `[sua maior economia gerada — ver doc 3]`

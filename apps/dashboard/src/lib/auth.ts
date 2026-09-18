@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
+import { tenants } from '@agenda-facil/db';
 
 const COOKIE_NAME = 'af_session';
 const COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
@@ -46,6 +47,31 @@ export async function setSessionCookie(token: string) {
 export async function clearSessionCookie() {
   const store = await cookies();
   store.delete(COOKIE_NAME);
+}
+
+/**
+ * Sessão válida E tenant que ainda existe no banco.
+ *
+ * `readSession` só confere a assinatura do JWT, que vale 30 dias. Se o tenant
+ * for apagado nesse intervalo, o cookie continua "válido" apontando para algo
+ * inexistente: /login mandava para /home e /home devolvia para /login, num
+ * loop infinito (ERR_TOO_MANY_REDIRECTS). Quem decide redirecionamento deve
+ * usar esta função, não `readSession` sozinha.
+ *
+ * @returns null quando não há cookie, o token é inválido/expirado, ou o tenant
+ *          da sessão não existe mais — todos os casos em que a saída é o login.
+ */
+export async function resolveSessionTenant(): Promise<{
+  session: SessionPayload;
+  tenant: { id: string; slug: string; name: string };
+} | null> {
+  const session = await readSession();
+  if (!session) return null;
+
+  const tenant = await tenants.getById(session.tenant_id);
+  if (!tenant) return null;
+
+  return { session, tenant };
 }
 
 export const SESSION_COOKIE_NAME = COOKIE_NAME;

@@ -1,4 +1,6 @@
 const { getPool } = require('../pool');
+const servicesQueries = require('./services');
+const { defaultsFor } = require('../seeds/profession-defaults');
 
 async function getBySlug(slug) {
   const { rows } = await getPool().query(
@@ -154,7 +156,19 @@ async function listAll() {
   return rows;
 }
 
-async function createNew({ slug, name, profession_type, timezone, owner_phone, whatsapp_number }) {
+// Tenant novo nasce com o catálogo da própria profissão. Sem isso ele ficava
+// vazio e quem configurava copiava serviços de outro tenant — origem do caso
+// em que uma clínica de estética passou a oferecer "Corte" e "Barba".
+// `seedCatalog: false` pula essa etapa (ex: restauração de backup).
+async function createNew({
+  slug,
+  name,
+  profession_type,
+  timezone,
+  owner_phone,
+  whatsapp_number,
+  seedCatalog = true,
+}) {
   const tenant = await upsertTenant({
     slug,
     name,
@@ -167,6 +181,15 @@ async function createNew({ slug, name, profession_type, timezone, owner_phone, w
     await setOwnerPhone(tenant.id, owner_phone);
   }
   await upsertSettings(tenant.id, {});
+
+  if (seedCatalog) {
+    const { services, businessHours } = defaultsFor(profession_type);
+    for (const svc of services) {
+      await servicesQueries.upsertByName(tenant.id, svc);
+    }
+    await servicesQueries.replaceBusinessHours(tenant.id, businessHours);
+  }
+
   return tenant;
 }
 

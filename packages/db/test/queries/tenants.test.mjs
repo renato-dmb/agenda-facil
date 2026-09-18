@@ -99,3 +99,66 @@ describe('queries/tenants', () => {
     expect(r.status).toBe('paused');
   });
 });
+
+describe('queries/tenants — createNew semeia o catálogo da profissão', () => {
+  it('cria tenant de estética já com serviços de estética e horários', async () => {
+    const t = await tenants.createNew({
+      slug: 'clinica-estetica-teste',
+      name: 'Clínica Estética Teste',
+      profession_type: 'estetica',
+      owner_phone: '5511900000001',
+    });
+
+    const { rows: svc } = await pool.query(
+      'SELECT name FROM services WHERE tenant_id = $1 ORDER BY display_order',
+      [t.id],
+    );
+    const nomes = svc.map((s) => s.name.toLowerCase()).join(' | ');
+    expect(svc.length).toBeGreaterThan(0);
+    expect(nomes).toMatch(/limpeza de pele/);
+    // A regressão que motivou isto: estética nascendo com catálogo de barbearia.
+    expect(nomes).not.toMatch(/\bbarba\b/);
+
+    const { rows: hours } = await pool.query(
+      'SELECT weekday FROM business_hours WHERE tenant_id = $1',
+      [t.id],
+    );
+    expect(hours.length).toBeGreaterThan(0);
+  });
+
+  it('cria tenant de barbearia com o catálogo de barbearia', async () => {
+    const t = await tenants.createNew({
+      slug: 'barbearia-teste',
+      name: 'Barbearia Teste',
+      profession_type: 'barbearia',
+      owner_phone: '5511900000002',
+    });
+    const { rows } = await pool.query('SELECT name FROM services WHERE tenant_id = $1', [t.id]);
+    const nomes = rows.map((s) => s.name.toLowerCase()).join(' | ');
+    expect(nomes).toMatch(/corte/);
+    expect(nomes).toMatch(/barba/);
+  });
+
+  it('profissão desconhecida não quebra a criação — cai no catálogo genérico', async () => {
+    const t = await tenants.createNew({
+      slug: 'profissao-exotica-teste',
+      name: 'Profissão Exótica',
+      profession_type: 'taxidermia-quantica',
+      owner_phone: '5511900000003',
+    });
+    const { rows } = await pool.query('SELECT name FROM services WHERE tenant_id = $1', [t.id]);
+    expect(rows.length).toBeGreaterThan(0);
+  });
+
+  it('seedCatalog:false cria o tenant sem nenhum serviço', async () => {
+    const t = await tenants.createNew({
+      slug: 'sem-catalogo-teste',
+      name: 'Sem Catálogo',
+      profession_type: 'estetica',
+      owner_phone: '5511900000004',
+      seedCatalog: false,
+    });
+    const { rows } = await pool.query('SELECT name FROM services WHERE tenant_id = $1', [t.id]);
+    expect(rows).toHaveLength(0);
+  });
+});
